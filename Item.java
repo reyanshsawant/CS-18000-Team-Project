@@ -2,12 +2,14 @@ import java.util.ArrayList;
 
 public class Item {
   private double price;
+  private String sellerUsername;
   private String name;
   private String description;
   private int id;
 
-  public Item(double price, String name, String description, int id) {
+  public Item(double price, String sellerUsername, String name, String description, int id) {
     this.price = price;
+    this.username = username;
     this.name = name;
     this.description = description;
     this.id = id;
@@ -15,6 +17,10 @@ public class Item {
 
   public double getPrice() {
     return price;
+  }
+
+  public String getSellerUsername() {
+    return sellerUsername;
   }
 
   public String getName() {
@@ -33,12 +39,16 @@ public class Item {
     this.price = price;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setSellerUsername(String sellerUsername) {
+    this.sellerUsername = sellerUsername;
   }
 
   public void setDescription(String description) {
     this.description = description;
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
   
   public void setID(int id) {
@@ -47,6 +57,6 @@ public class Item {
 
   @Override
   public String toString() {
-    return "Item Name: " + name + " Price: " + price + " Description " + description;
+    return "Item Name: " + name + ", ID: " + id + ", Price: " + price + ", Description: " + description + ", Seller: " + sellerUsername;
   }
 }
