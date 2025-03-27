@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class Item {
   private double price;
   private String name;
@@ -31,5 +33,10 @@ public class Item {
 
   public void setDescription(String description) {
     this.description = description;
+  }
+
+  @Override
+  public String toString() {
+    return "Item Name: " + name + " Price: " + price + " Description " + description;
   }
 }
