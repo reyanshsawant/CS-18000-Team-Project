@@ -4,11 +4,13 @@ public class Item {
   private double price;
   private String name;
   private String description;
+  private int id;
 
-  public Item(double price, String name, String description) {
+  public Item(double price, String name, String description, int id) {
     this.price = price;
     this.name = name;
     this.description = description;
+    this.id = id;
   }
 
   public double getPrice() {
@@ -23,6 +25,10 @@ public class Item {
     return description;
   }
 
+  public int getID() {
+    return id;
+  }
+
   public void setPrice(double price) {
     this.price = price;
   }
@@ -33,6 +39,10 @@ public class Item {
 
   public void setDescription(String description) {
     this.description = description;
+  }
+  
+  public void setID(int id) {
+    this.id = id;
   }
 
   @Override
