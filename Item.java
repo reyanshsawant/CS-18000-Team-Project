@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-
 public class Item {
   private double price;
   private String sellerUsername;
