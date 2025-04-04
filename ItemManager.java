@@ -14,8 +14,7 @@ public class ItemManager {
     public void removeItem(int id) {
         for (int i = 0; i < items.size(); i++) {
             if (items.get(i).getID() == id) {
-                items.remove(i);
-                break;
+                items.remove();
             }
         }
     }
