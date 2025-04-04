@@ -29,7 +29,7 @@ public class MarketplaceUser implements User {
     }
 
     @Override
-    public void addFunds(double amount) {
+    public synchronized void addFunds(double amount) {
         if (amount > 0) {
             balance += amount;
             System.out.println("Added $" + amount + " to your balance.");
@@ -40,7 +40,7 @@ public class MarketplaceUser implements User {
     }
 
     @Override
-    public boolean makePurchase(double amount) {
+    public synchronized boolean makePurchase(double amount) {
         if (amount > 0 && balance >= amount) {
             balance -= amount;
             System.out.println("Purchase successful! Deducted $" + amount);
@@ -53,12 +53,12 @@ public class MarketplaceUser implements User {
     }
 
     @Override
-    public void displayUserInfo() {
+    public synchronized void displayUserInfo() {
         System.out.println("User: " + username);
         System.out.println("Balance: $" + balance);
     }
 
-    public static User loginOrCreateUser(String username, String password) throws IOException {
+    public static synchronized User loginOrCreateUser(String username, String password) throws IOException {
         File file = new File(FILE_NAME);
         if (!file.exists()) file.createNewFile();
 
@@ -95,7 +95,7 @@ public class MarketplaceUser implements User {
         return new MarketplaceUser(username, password, balance);
     }
 
-    public static boolean deleteUser(String username, String password) throws IOException {
+    public static synchronized boolean deleteUser(String username, String password) throws IOException {
         File file = new File(FILE_NAME);
         if (!file.exists()) {
             System.out.println("No user database found.");
@@ -130,7 +130,7 @@ public class MarketplaceUser implements User {
         return userDeleted;
     }
 
-    private void updateUserData() {
+    private synchronized void updateUserData() {
         try {
             File file = new File(FILE_NAME);
             Scanner scanner = new Scanner(file);
