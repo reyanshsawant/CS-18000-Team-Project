@@ -1,6 +1,12 @@
-
-
-public class Item implements ItemInterface {
+/**
+ * Item Class
+ *
+ * Purdue University -- CS18000 -- Spring 2025 -- Team Project01
+ *
+ * @author Reyansh Sawant
+ * @version April 6th, 2025
+ */
+public class Item implements ItemInterface{
     private int itemId;
     private String name;
     private String description;

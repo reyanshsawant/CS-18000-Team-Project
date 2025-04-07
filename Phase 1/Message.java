@@ -1,3 +1,11 @@
+/**
+ * Message
+ *
+ * Purdue University -- CS18000 -- Spring 2025 -- Team Project01
+ *
+ * @author Neil Lapsia
+ * @version April 6th, 2025
+ */
 public class Message {
     private String sender;
     private String receiver;

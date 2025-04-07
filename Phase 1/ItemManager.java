@@ -1,6 +1,13 @@
 import java.io.*;
 import java.util.ArrayList;
-
+/**
+ * ItemManager Class
+ *
+ * Purdue University -- CS18000 -- Spring 2025 -- Team Project01
+ *
+ * @author Reyansh Sawant
+ * @version April 6th, 2025
+ */
 public class ItemManager {
     private ArrayList<Item> items = new ArrayList<>();
     private int itemIdCounter = 0;
@@ -109,7 +116,8 @@ public class ItemManager {
     private void saveItems() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(itemsFile))) {
             for (Item item : items) {
-                writer.write(item.getName() + "," + item.getDescription() + "," + item.getPrice() + "," + item.getPicturePath() + "," + item.getSellerName());
+                writer.write(item.getName() + "," + item.getDescription() + "," + item.getPrice() 
+                + "," + item.getPicturePath() + "," + item.getSellerName());
                 writer.newLine();
             }
         } catch (IOException e) {

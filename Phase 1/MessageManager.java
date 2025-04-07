@@ -1,6 +1,13 @@
 import java.io.*;
 import java.util.ArrayList;
-
+/**
+ * Message Interface
+ *
+ * Purdue University -- CS18000 -- Spring 2025 -- Team Project01
+ *
+ * @author Neil Lapsia
+ * @version April 6th, 2025
+ */
 public class MessageManager implements MessageInterface {
     private ArrayList<Message> messages = new ArrayList<>();
     private final String messagesFile = "messages.txt";
@@ -23,7 +30,8 @@ public class MessageManager implements MessageInterface {
         ArrayList<String> userMessages = new ArrayList<>();
         for (Message message : messages) {
             if (message.getReceiver().equals(username)) {
-                userMessages.add("[" + message.getTimestamp() + "] " + message.getSender() + ": " + message.getContent());
+                userMessages.add("[" + message.getTimestamp() + "] " 
+                + message.getSender() + ": " + message.getContent());
             }
         }
         return userMessages.toArray(new String[0]); // Convert list to array

@@ -1,3 +1,11 @@
+/**
+ * User.java
+ *
+ * Purdue University -- CS18000 -- Spring 2025 -- Team Project01
+ *
+ * @author Shankh Gupta
+ * @version April 6th, 2025
+ */
 public class User implements UserInterface {
     private String username;
     private String password;
