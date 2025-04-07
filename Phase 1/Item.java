@@ -6,7 +6,7 @@
  * @author Reyansh Sawant
  * @version April 6th, 2025
  */
-public class Item implements ItemInterface{
+public class Item implements ItemInterface {
     private int itemId;
     private String name;
     private String description;
@@ -24,12 +24,14 @@ public class Item implements ItemInterface{
 
     @Override
     public void createItem(String name, String description, double price) {
-        // Logic to create item
+        this.name = name;
+        this.description = description;
+        this.price = price;
     }
 
     @Override
     public void deleteItem(int itemId) {
-        // Logic to delete item
+        this.itemId = itemId;
     }
 
     @Override
@@ -73,8 +75,13 @@ public class Item implements ItemInterface{
     public String getSeller() {
         return sellerUsername;
     }
-    public String getSellerName() {return sellerUsername;}
-    public void setSellerName(String seller) {this.sellerUsername = seller;}
+    public String getSellerName() {
+        return sellerUsername;
+    }
+    public void setSellerName(String seller) {
+        this.sellerUsername = seller;
+    }
+
 
     public void setSeller(String seller) {
         this.sellerUsername = seller;

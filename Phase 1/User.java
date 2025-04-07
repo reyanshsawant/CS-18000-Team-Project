@@ -20,7 +20,8 @@ public class User implements UserInterface {
 
     @Override
     public void createAccount(String username, String password) {
-        // Logic to create account
+        this.username = username;
+        this.password = password;
     }
 
     @Override
@@ -30,7 +31,7 @@ public class User implements UserInterface {
 
     @Override
     public void deleteAccount(String username) {
-        // Logic to delete account
+        this.username = username;
     }
 
     @Override
