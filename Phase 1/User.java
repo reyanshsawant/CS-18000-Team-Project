@@ -7,31 +7,31 @@
  * @version April 6th, 2025
  */
 public class User implements UserInterface {
-    private String username;
-    private String password;
+    private String userName;
+    private String userPassword;
     private double balance;
 
     // Constructor with balance parameter
     public User(String username, String password, double balance) {
-        this.username = username;
-        this.password = password;
+        this.userName = username;
+        this.userPassword = password;
         this.balance = balance;
     }
 
     @Override
     public void createAccount(String username, String password) {
-        this.username = username;
-        this.password = password;
+        this.userName = username;
+        this.userPassword = password;
     }
 
     @Override
     public boolean login(String username, String password) {
-        return this.username.equals(username) && this.password.equals(password);
+        return this.userName.equals(username) && this.userPassword.equals(password);
     }
 
     @Override
     public void deleteAccount(String username) {
-        this.username = username;
+        this.userName = username;
     }
 
     @Override
@@ -45,19 +45,19 @@ public class User implements UserInterface {
     }
 
     public String getUsername() {
-        return username;
+        return userName;
     }
 
     public String getPassword() {
-        return password;
+        return userPassword;
     }
 
     public void setUsername(String username) {
-        this.username = username;
+        this.userName = username;
     }
 
     public void setPassword(String password) {
-        this.password = password;
+        this.userPassword = password;
     }
     
 }
