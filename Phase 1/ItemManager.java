@@ -117,7 +117,7 @@ public class ItemManager {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(itemsFile))) {
             for (Item item : items) {
                 writer.write(item.getName() + "," + item.getDescription() + "," + item.getPrice() 
-                + "," + item.getPicturePath() + "," + item.getSellerName());
+                    + "," + item.getPicturePath() + "," + item.getSellerName());
                 writer.newLine();
             }
         } catch (IOException e) {

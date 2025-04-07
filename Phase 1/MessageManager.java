@@ -31,7 +31,7 @@ public class MessageManager implements MessageInterface {
         for (Message message : messages) {
             if (message.getReceiver().equals(username)) {
                 userMessages.add("[" + message.getTimestamp() + "] " 
-                + message.getSender() + ": " + message.getContent());
+                    + message.getSender() + ": " + message.getContent());
             }
         }
         return userMessages.toArray(new String[0]); // Convert list to array
