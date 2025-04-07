@@ -1,5 +1,11 @@
-import java.util.ArrayList;
-
+/**
+ * MainDatabase.java
+ *
+ * Purdue University -- CS18000 -- Spring 2025 -- Team Project01
+ *
+ * @author Arjun Anilkumar 
+ * @version April 6th, 2025
+ */
 //main manages the item, messages, and user managers
 public class MainDatabase {
     private UserManager userManager;

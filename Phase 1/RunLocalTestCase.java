@@ -1,5 +1,12 @@
 import java.util.ArrayList;
-
+/**
+ * RunLocalTestCase.java
+ *
+ * Purdue University -- CS18000 -- Spring 2025 -- Team Project01
+ *
+ * @author Arjun Anilkumar
+ * @version April 6th, 2025
+ */
 public class RunLocalTestCase {
     public static void main(String[] args) {
         MainDatabase database = new MainDatabase();

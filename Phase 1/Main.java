@@ -1,6 +1,13 @@
 import java.util.ArrayList;
 import java.util.Scanner;
-
+/**
+ * Main Class
+ *
+ * Purdue University -- CS18000 -- Spring 2025 -- Team Project01
+ *
+ * @author Arjun Anilkumar
+ * @version April 6th, 2025
+ */
 public class Main {
     public static void main(String[] args) {
         UserManager userManager = new UserManager();
@@ -50,7 +57,8 @@ public class Main {
                                 if (response.equalsIgnoreCase("yes")) {
                                     System.out.print("Enter your response: ");
                                     String replyContent = scanner.nextLine();
-                                    Message reply = new Message(currentUser.getUsername(), message.getSender(), replyContent);
+                                    Message reply = new Message(currentUser.getUsername(),
+                                     message.getSender(), replyContent);
                                     messageManager.addMessage(reply);
                                     System.out.println("Response sent!");
 
@@ -170,7 +178,8 @@ public class Main {
                     } else {
                         System.out.println("Available items:");
                         for (Item item : items) {
-                            System.out.println("- " + item.getName() + " ($" + item.getPrice() + ") - Seller: " + item.getSeller());
+                            System.out.println("- " + item.getName() + " ($" + item.getPrice() + ") - Seller: " 
+                            + item.getSeller());
                             if (item.getPicturePath() != null) {
                                 System.out.println("  Picture: " + item.getPicturePath());
                             }
@@ -192,7 +201,8 @@ public class Main {
                     System.out.println("Available items:");
                     for (int i = 0; i < buyItems.size(); i++) {
                         Item item = buyItems.get(i);
-                        System.out.println((i + 1) + ". " + item.getName() + " - $" + item.getPrice() + " (Seller: " + item.getSeller() + ")");
+                        System.out.println((i + 1) + ". " + item.getName() + " - $" + item.getPrice() +
+                         " (Seller: " + item.getSeller() + ")");
                     }
 
                     System.out.print("Enter the number of the item you want to buy: ");
@@ -217,10 +227,13 @@ public class Main {
                     }
 
                     // Perform the transaction
-                    userManager.updateUserBalance(currentUser.getUsername(), currentUser.getBalance() - selectedItem.getPrice());
-                    userManager.updateUserBalance(seller.getUsername(), seller.getBalance() + selectedItem.getPrice());
+                    userManager.updateUserBalance(currentUser.getUsername(), currentUser.getBalance()
+                     - selectedItem.getPrice());
+                    userManager.updateUserBalance(seller.getUsername(), seller.getBalance() + 
+                    selectedItem.getPrice());
                     itemManager.removeItem(selectedItem.getItemId());
-                    System.out.println("Purchase successful! You bought " + selectedItem.getName() + " for $" + selectedItem.getPrice());
+                    System.out.println("Purchase successful! You bought " + selectedItem.getName()
+                     + " for $" + selectedItem.getPrice());
                     break;
 
                 case 5:
@@ -238,14 +251,16 @@ public class Main {
                             System.out.print("Enter amount to add: ");
                             double amountToAdd = scanner.nextDouble();
                             scanner.nextLine(); // Consume newline
-                            userManager.updateUserBalance(currentUser.getUsername(), currentUser.getBalance() + amountToAdd);
+                            userManager.updateUserBalance(currentUser.getUsername(),
+                             currentUser.getBalance() + amountToAdd);
                             System.out.println("Balance updated successfully!");
                         } else if (balanceChoice == 2) {
                             System.out.print("Enter amount to remove: ");
                             double amountToRemove = scanner.nextDouble();
                             scanner.nextLine(); // Consume newline
                             if (currentUser.getBalance() >= amountToRemove) {
-                                userManager.updateUserBalance(currentUser.getUsername(), currentUser.getBalance() - amountToRemove);
+                                userManager.updateUserBalance(currentUser.getUsername(),
+                                 currentUser.getBalance() - amountToRemove);
                                 System.out.println("Balance updated successfully!");
                             } else {
                                 System.out.println("Insufficient balance.");

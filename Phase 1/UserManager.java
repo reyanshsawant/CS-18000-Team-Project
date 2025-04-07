@@ -1,6 +1,13 @@
 import java.io.*;
 import java.util.ArrayList;
-
+/**
+ * UserManager.java
+ *
+ * Purdue University -- CS18000 -- Spring 2025 -- Team Project01
+ *
+ * @author Shankh Gupta
+ * @version April 6th, 2025
+ */
 public class UserManager {
     private ArrayList<User> users = new ArrayList<>();
     private final String usersFile = "users.txt";
