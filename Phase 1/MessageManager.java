@@ -16,6 +16,36 @@ public class MessageManager implements MessageInterface {
         loadMessages();
     }
 
+    @Override
+    public String getSender() {
+        return "";
+    }
+
+    @Override
+    public String getReceiver() {
+        return "";
+    }
+
+    @Override
+    public String getContent() {
+        return "";
+    }
+
+    @Override
+    public void setSender(String sender) {
+
+    }
+
+    @Override
+    public void setReceiver(String receiver) {
+
+    }
+
+    @Override
+    public void setContent(String content) {
+
+    }
+
     //sends message (adds to messages.txt)
     @Override
     public void sendMessage(String sender, String receiver, String messageContent) {

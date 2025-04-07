@@ -7,7 +7,7 @@
  * @version April 6th, 2025
  */
 public interface UserInterface {
-        String getUsername();
+    String getUsername();
     String getPassword();
     double getBalance();
 
