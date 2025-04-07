@@ -59,5 +59,8 @@ public class User implements UserInterface {
     public void setPassword(String password) {
         this.userPassword = password;
     }
+    public void setBalance(double balance) {
+        this.balance = balance;
+    }
     
 }
