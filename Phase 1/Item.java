@@ -8,25 +8,25 @@
  */
 public class Item implements ItemInterface {
     private int itemId;
-    private String name;
-    private String description;
-    private double price;
-    private String picturePath;
+    private String itemName;
+    private String itemDescription;
+    private double itemPrice;
+    private String itemPicturePath;
     private String sellerUsername; 
 //    private String picturePath; // maybe implement this for extra credit
 
     public Item(String name, String description, double price) {
-        this.name = name;
-        this.description = description;
-        this.price = price;
-        this.picturePath = null;
+        this.itemName = name;
+        this.itemDescription = description;
+        this.itemPrice = price;
+        this.itemPicturePath = null;
     }
 
     @Override
     public void createItem(String name, String description, double price) {
-        this.name = name;
-        this.description = description;
-        this.price = price;
+        this.itemName = name;
+        this.itemDescription = description;
+        this.itemPrice = price;
     }
 
     @Override
@@ -48,29 +48,29 @@ public class Item implements ItemInterface {
     }
 
     public String getName() {
-        return name;
+        return itemName;
     }
     public String getDescription() {
-        return description;
+        return itemDescription;
     }
     public double getPrice() {
-        return price;
+        return itemPrice;
     }
     public String getPicturePath() {
-        return picturePath;
+        return itemPicturePath;
     }
     
     public void setName(String name) {
-        this.name = name;
+        this.itemName = name;
     }
     public void setDescription(String description) {
-        this.description = description;
+        this.itemDescription = description;
     }
     public void setPrice(double price) {
-        this.price = price;
+        this.itemPrice = price;
     }
     public void setPicturePath(String picturePath) {
-        this.picturePath = picturePath;
+        this.itemPicturePath = picturePath;
     }
     public String getSeller() {
         return sellerUsername;
