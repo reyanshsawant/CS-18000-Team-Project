@@ -1,100 +1,209 @@
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.util.ArrayList;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.experimental.runners.Enclosed;
+import org.junit.runner.JUnitCore;
+import org.junit.runner.Result;
+import org.junit.runner.RunWith;
+import org.junit.runner.notification.Failure;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.PrintStream;
+
 /**
- * RunLocalTestCase.java
+ * runLocalTestCase.java
  *
- * Purdue University -- CS18000 -- Spring 2025 -- Team Project01
+ * purdue university -- cs18000 -- spring 2025 -- team project01
  *
- * @author Arjun Anilkumar
- * @version April 6th, 2025
+ * @author arjun anilkumar
+ * @version april 6th, 2025
  */
+@RunWith(Enclosed.class)
 public class RunLocalTestCase {
     public static void main(String[] args) {
-        MainDatabase database = new MainDatabase();
+        Result result = JUnitCore.runClasses(TestCase.class);
 
-        UserManager userManager = database.getUserManager();
-        ItemManager itemManager = database.getItemManager();
-        MessageManager messageManager = database.getMessageManager();
+        if (result.wasSuccessful()) {
+            System.out.println("cool - all tests passed");
+        } else {
+            for (Failure failure : result.getFailures()) {
+                System.out.println(failure.toString());
+            }
+        }
+    }
 
-        System.out.println("Starting comprehensive test...");
+    /**
+     * public test cases for the marketplace app
+     *
+     * <p>purdue university -- cs18000 -- spring 2025</p>
+     */
+    public static class TestCase {
+        private final PrintStream standardOut = System.out;
+        private final InputStream standardIn = System.in;
 
-        // Step 1: Add multiple users
-        System.out.println("\nAdding users...");
-        User user1 = new User("user1", "password1", 100.0);
-        User user2 = new User("user2", "password2", 200.0);
-        User user3 = new User("user3", "password3", 300.0);
-        userManager.addUser(user1);
-        userManager.addUser(user2);
-        userManager.addUser(user3);
+        @SuppressWarnings("FieldCanBeLocal")
+        private ByteArrayInputStream testInput;
 
-        // Verify users were added
-        assert userManager.getUser("user1") != null : "User1 not added!";
-        assert userManager.getUser("user2") != null : "User2 not added!";
-        assert userManager.getUser("user3") != null : "User3 not added!";
-        System.out.println("Users added successfully!");
+        @SuppressWarnings("FieldCanBeLocal")
+        private ByteArrayOutputStream testOutput;
 
-        // Step 2: Add items for each user
-        System.out.println("\nAdding items...");
-        Item item1 = new Item("Laptop", "High-performance laptop", 999.99);
-        item1.setSellerName("user1");
-        Item item2 = new Item("Phone", "Latest smartphone", 499.99);
-        item2.setSellerName("user2");
-        Item item3 = new Item("Tablet", "Lightweight tablet", 299.99);
-        item3.setSellerName("user3");
-        itemManager.addItem(item1);
-        itemManager.addItem(item2);
-        itemManager.addItem(item3);
+        @Before
+        public void setUpOutput() {
+            testOutput = new ByteArrayOutputStream();
+            System.setOut(new PrintStream(testOutput));
+        }
 
-        // Verify items were added
-        ArrayList<Item> items = itemManager.searchItemsByName("Laptop");
-        assert items.size() == 1 : "Laptop not added!";
-        System.out.println("Items added successfully!");
+        @After
+        public void resetSystemIO() {
+            System.setIn(standardIn);
+            System.setOut(standardOut);
+        }
 
-        // Step 3: Perform transactions (buying items)
-        System.out.println("\nPerforming transactions...");
-        User buyer = userManager.getUser("user2");
-        Item itemToBuy = itemManager.searchItemsByName("Laptop").get(0);
-        assert buyer.getBalance() >= itemToBuy.getPrice() : "Buyer does not have enough balance!";
-        userManager.updateUserBalance(buyer.getUsername(), buyer.getBalance() - itemToBuy.getPrice());
-        User seller = userManager.getUser(itemToBuy.getSellerName());
-        userManager.updateUserBalance(seller.getUsername(), seller.getBalance() + itemToBuy.getPrice());
-        itemManager.deleteItemByNameAndSeller(itemToBuy.getName(), itemToBuy.getSellerName());
-        System.out.println("Transaction completed successfully!");
+        private String getProgramOutput() {
+            return testOutput.toString();
+        }
 
-        // Verify balances
-        assert userManager.getUser("user2").getBalance() == 200.0 - 999.99 : "Buyer's balance not updated!";
-        assert userManager.getUser("user1").getBalance() == 100.0 + 999.99 : "Seller's balance not updated!";
-        System.out.println("Balances updated successfully!");
+        private void provideInput(String inputStr) {
+            testInput = new ByteArrayInputStream(inputStr.getBytes());
+            System.setIn(testInput);
+        }
 
-        // Step 4: Delete a user and their items
-        System.out.println("\nDeleting user and their items...");
-        userManager.deleteUser("user3");
-        itemManager.deleteItemsBySeller("user3");
+        @Test(timeout = 1000)
+        public void userCreationTest() {
+            // setup
+            MainDatabase db = new MainDatabase();
+            UserManager userHandler = db.getUserManager();
 
-        // Verify user and items were deleted
-        assert userManager.getUser("user3") == null : "User3 not deleted!";
-        assert itemManager.searchItemsByName("Tablet").isEmpty() : "User3's items not deleted!";
-        System.out.println("User and their items deleted successfully!");
+            // add some test users
+            userHandler.addUser(new User("testUser1", "pass123", 100.0));
+            userHandler.addUser(new User("testUser2", "pass456", 200.0));
 
-        // Step 5: Test messaging
-        System.out.println("\nTesting messaging...");
-        messageManager.sendMessage("user1", "user2", "Is the phone still available?");
+            // check if they exist
+            assertNotNull("user1 should exist", userHandler.getUser("testUser1"));
+            assertNotNull("user2 should exist", userHandler.getUser("testUser2"));
 
-        // Verify message was added
-        ArrayList<Message> messages = messageManager.getMessagesForUser("user2");
-        assert messages.size() == 1 : "Message not added!";
-        assert messages.get(0).getContent().equals("Is the phone still available?") : "Message content incorrect!";
-        System.out.println("Messaging tested successfully!");
+            // just checking output for no reason
+            String output = getProgramOutput();
+            assertEquals("", output.trim());
+        }
 
-        // Step 6: Search for items
-        System.out.println("\nTesting item search...");
-        ArrayList<Item> searchResults = itemManager.searchItemsByName("Phone");
-        assert searchResults.size() == 1 : "Item search by name failed!";
+        @Test(timeout = 1000)
+        public void itemListingTest() {
+            // init db
+            MainDatabase db = new MainDatabase();
+            ItemManager itemHandler = db.getItemManager();
 
-        searchResults = itemManager.searchItemsByPriceRange(400.0, 600.0);
-        assert searchResults.size() == 1 : "Item search by price range failed!";
+            // add some items
+            Item laptop = new Item("MacBook", "apple laptop", 1299.99);
+            laptop.setSellerName("seller1");
 
-        System.out.println("Item search tested successfully!");
+            Item phone = new Item("iPhone", "latest model", 999.99);
+            phone.setSellerName("seller2");
 
-        System.out.println("\nAll tests passed successfully!");
+            itemHandler.addItem(laptop);
+            itemHandler.addItem(phone);
+
+            // verify
+            assertEquals("should find 1 macbook", 1, itemHandler.searchItemsByName("MacBook").size());
+            assertEquals("should find 1 iphone", 1, itemHandler.searchItemsByName("iPhone").size());
+        }
+        @Test(timeout = 1000)
+        public void testAddItems() {
+            MainDatabase db = new MainDatabase();
+            ItemManager itemHandler = db.getItemManager();
+
+            Item item = new Item("TestItem", "description", 50.0);
+            item.setSellerName("testSeller");
+            itemHandler.addItem(item);
+
+            assertEquals("should find 1 test item", 1, itemHandler.searchItemsByName("TestItem").size());
+        }
+        @Test(timeout = 1000)
+        public void purchaseTest() {
+            // setup db
+            MainDatabase db = new MainDatabase();
+            UserManager userHandler = db.getUserManager();
+            ItemManager itemHandler = db.getItemManager();
+
+            // create users and item
+            userHandler.addUser(new User("seller", "sell123", 500.0));
+            userHandler.addUser(new User("buyer", "buy123", 1000.0));
+
+            Item car = new Item("Tesla", "Model 3", 40000.0);
+            car.setSellerName("seller");
+            itemHandler.addItem(car);
+
+            // simulate purchase
+            User buyer = userHandler.getUser("buyer");
+            Item purchasedItem = itemHandler.searchItemsByName("Tesla").get(0);
+
+            userHandler.updateUserBalance(buyer.getUsername(),
+                    buyer.getBalance() - purchasedItem.getPrice());
+
+            User seller = userHandler.getUser(purchasedItem.getSellerName());
+            userHandler.updateUserBalance(seller.getUsername(),
+                    seller.getBalance() + purchasedItem.getPrice());
+
+            itemHandler.deleteItemByNameAndSeller(purchasedItem.getName(),
+                    purchasedItem.getSellerName());
+
+            // check balances
+            assertEquals("buyer's new balance", 1000.0 - 40000.0, buyer.getBalance(), 0.01);
+            assertEquals("seller's new balance", 500.0 + 40000.0, seller.getBalance(), 0.01);
+        }
+
+        @Test(timeout = 1000)
+        public void messageFunctionTest() {
+            // setup
+            MainDatabase db = new MainDatabase();
+            MessageManager msgManager = db.getMessageManager();
+
+            // send some messages
+            msgManager.sendMessage("userA", "userB", "hey");
+            msgManager.sendMessage("userB", "userA", "what's up?");
+
+            // check messages
+            ArrayList<Message> userAMessages = msgManager.getMessagesForUser("userA");
+            assertEquals("userA should have 1 message", 1, userAMessages.size());
+            assertEquals("message content check", "what's up?", userAMessages.get(0).getContent());
+        }
+
+        @Test(timeout = 1000)
+        public void itemSearchTest() {
+            MainDatabase db = new MainDatabase();
+            ItemManager itemHandler = db.getItemManager();
+
+            // populate some items
+            Item item1 = new Item("Chair", "comfy chair", 59.99);
+            item1.setSellerName("ikea");
+
+            Item item2 = new Item("Desk", "large desk", 199.99);
+            item2.setSellerName("ikea");
+
+            itemHandler.addItem(item1);
+            itemHandler.addItem(item2);
+
+            // test searches
+            ArrayList<Item> cheapItems = itemHandler.searchItemsByPriceRange(0.0, 100.0);
+            assertEquals("should find 1 cheap item", 1, cheapItems.size());
+
+        }
+
+        @Test(timeout = 1000)
+        public void accountDeletionTest() {
+            MainDatabase db = new MainDatabase();
+            UserManager userHandler = db.getUserManager();
+
+            // create then delete user
+            userHandler.addUser(new User("tempUser", "tempPass", 0.0));
+            userHandler.deleteUser("tempUser");
+
+            // verify
+            assertNull("user should be gone", userHandler.getUser("tempUser"));
+        }
     }
 }
