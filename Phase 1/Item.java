@@ -7,7 +7,7 @@
  * @version April 6th, 2025
  */
 public class Item implements ItemInterface {
-    private int itemId;
+    private int itemIDnum;
     private String itemName;
     private String itemDescription;
     private double itemPrice;
@@ -31,7 +31,7 @@ public class Item implements ItemInterface {
 
     @Override
     public void deleteItem(int itemId) {
-        this.itemId = itemId;
+        this.itemIDnum = itemId;
     }
 
     @Override
@@ -41,10 +41,10 @@ public class Item implements ItemInterface {
     }
 
     public void setItemId(int itemId) {
-        this.itemId = itemId;
+        this.itemIDnum = itemId;
     }
     public int getItemId() {
-        return itemId;
+        return itemIDnum;
     }
 
     public String getName() {
