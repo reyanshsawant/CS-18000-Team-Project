@@ -10,4 +10,18 @@ public interface ItemInterface {
     void createItem(String name, String description, double price);
     void deleteItem(int itemId);
     String searchItem(String keyword);
+
+    int getItemId();
+    String getName();
+    String getDescription();
+    double getPrice();
+    String getPicturePath();
+    String getSellerName();
+
+    void setItemId(int itemId);
+    void setName(String name);
+    void setDescription(String description);
+    void setPrice(double price);
+    void setPicturePath(String picturePath);
+    void setSellerName(String sellerName);
 }
