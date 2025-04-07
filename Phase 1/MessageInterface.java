@@ -7,6 +7,19 @@
  * @version April 6th, 2025
  */
 public interface MessageInterface {
+
+    String getSender();
+    String getReceiver();
+    String getContent();
+
+    void setSender(String sender);
+    void setReceiver(String receiver);
+    void setContent(String content);
+
+
+
     void sendMessage(String sender, String receiver, String message);
     String[] getMessages(String username);
+
+    
 }
