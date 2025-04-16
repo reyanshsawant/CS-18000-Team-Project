@@ -12,7 +12,8 @@ public class Item implements ItemInterface {
     private String itemDescription;
     private double itemPrice;
     private String itemPicturePath;
-    private String sellerUsername; 
+    private String sellerUsername;
+    private String category;
 //    private String picturePath; // maybe implement this for extra credit
 
     public Item(String name, String description, double price) {
@@ -21,6 +22,14 @@ public class Item implements ItemInterface {
         this.itemPrice = price;
         this.itemPicturePath = null;
     }
+    public Item(String name, String description, double price, String category) {
+        this.itemName = name;
+        this.itemDescription = description;
+        this.itemPrice = price;
+        this.category = category;
+        this.itemPicturePath = null;
+    }
+
 
     @Override
     public void createItem(String name, String description, double price) {
@@ -59,7 +68,7 @@ public class Item implements ItemInterface {
     public String getPicturePath() {
         return itemPicturePath;
     }
-    
+
     public void setName(String name) {
         this.itemName = name;
     }
@@ -82,12 +91,19 @@ public class Item implements ItemInterface {
         this.sellerUsername = seller;
     }
 
-
     public void setSeller(String seller) {
         this.sellerUsername = seller;
     }
-    
-    
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+
+
     // // Method to upload a picture
     // public boolean uploadPicture(String filePath) {
     //     File file = new File(filePath);
