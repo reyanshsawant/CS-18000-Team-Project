@@ -103,6 +103,13 @@ public class ItemManager {
                     item.setSellerName(parts[4]);
                     items.add(item);
                 }
+                if (parts.length == 6) {
+                    Item item = new Item(parts[0], parts[1], Double.parseDouble(parts[2]), parts[5]);
+                    item.setPicturePath(parts[3]);
+                    item.setSellerName(parts[4]);
+                    items.add(item);
+                }
+
             }
         } catch (FileNotFoundException e) {
             System.out.println("Items file not found. Starting with an empty item list.");
@@ -116,8 +123,9 @@ public class ItemManager {
     private void saveItems() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(itemsFile))) {
             for (Item item : items) {
-                writer.write(item.getName() + "," + item.getDescription() + "," + item.getPrice() 
-                    + "," + item.getPicturePath() + "," + item.getSellerName());
+                writer.write(item.getName() + "," + item.getDescription() + "," + item.getPrice()
+                        + "," + item.getPicturePath() + "," + item.getSellerName() + "," + item.getCategory());
+
                 writer.newLine();
             }
         } catch (IOException e) {

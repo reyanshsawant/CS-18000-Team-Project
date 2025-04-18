@@ -16,7 +16,7 @@ public class Message {
         this.sender = sender;
         this.receiver = receiver;
         this.content = content;
-        this.timestamp = System.currentTimeMillis(); 
+        this.timestamp = System.currentTimeMillis();
     }
 
     public String getSender() {
