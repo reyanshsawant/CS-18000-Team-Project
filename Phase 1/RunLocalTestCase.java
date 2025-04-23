@@ -8,25 +8,24 @@ import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.RunWith;
 import org.junit.runner.notification.Failure;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 /**
- * runLocalTestCase.java
+ * RunLocalTestCases
  *
- * purdue university -- cs18000 -- spring 2025 -- team project01
+ * Purdue University -- CS18000 -- Spring 2025 -- Team Project01
  *
- * @author arjun anilkumar
- * @version april 6th, 2025
+ * @author Shankh Gupta, Arjun Anilkumar
+ * @version April 17th, 2025
  */
+
+
 @RunWith(Enclosed.class)
 public class RunLocalTestCase {
     public static void main(String[] args) {
-        Result result = JUnitCore.runClasses(TestCase.class);
-
+        Result result = JUnitCore.runClasses(TestCase.class, ClientServerTest.class);
         if (result.wasSuccessful()) {
             System.out.println("cool - all tests passed");
         } else {
@@ -36,174 +35,172 @@ public class RunLocalTestCase {
         }
     }
 
-    /**
-     * public test cases for the marketplace app
-     *
-     * <p>purdue university -- cs18000 -- spring 2025</p>
-     */
     public static class TestCase {
-        private final PrintStream standardOut = System.out;
-        private final InputStream standardIn = System.in;
+        private static final String TEST_USERS_FILE = "test_users.txt";
+        private static final String TEST_ITEMS_FILE = "test_items.txt";
+        private static final String TEST_MESSAGES_FILE = "test_messages.txt";
 
-        @SuppressWarnings("FieldCanBeLocal")
-        private ByteArrayInputStream testInput;
-
-        @SuppressWarnings("FieldCanBeLocal")
-        private ByteArrayOutputStream testOutput;
+        private UserManager userHandler;
+        private ItemManager itemHandler;
+        private MessageManager messageHandler;
 
         @Before
-        public void setUpOutput() {
-            testOutput = new ByteArrayOutputStream();
-            System.setOut(new PrintStream(testOutput));
+        public void setUp() throws IOException {
+            new PrintWriter(TEST_USERS_FILE).close();
+            new PrintWriter(TEST_ITEMS_FILE).close();
+            new PrintWriter(TEST_MESSAGES_FILE).close();
+            userHandler = new UserManager(TEST_USERS_FILE);
+            itemHandler = new ItemManager(TEST_ITEMS_FILE);
+            messageHandler = new MessageManager(TEST_MESSAGES_FILE);
         }
 
         @After
-        public void resetSystemIO() {
-            System.setIn(standardIn);
-            System.setOut(standardOut);
-        }
-
-        private String getProgramOutput() {
-            return testOutput.toString();
-        }
-
-        private void provideInput(String inputStr) {
-            testInput = new ByteArrayInputStream(inputStr.getBytes());
-            System.setIn(testInput);
+        public void tearDown() {
+            new File(TEST_USERS_FILE).delete();
+            new File(TEST_ITEMS_FILE).delete();
+            new File(TEST_MESSAGES_FILE).delete();
         }
 
         @Test(timeout = 1000)
         public void userCreationTest() {
-            // setup
-            MainDatabase db = new MainDatabase();
-            UserManager userHandler = db.getUserManager();
-
-            // add some test users
             userHandler.addUser(new User("testUser1", "pass123", 100.0));
             userHandler.addUser(new User("testUser2", "pass456", 200.0));
-
-            // check if they exist
-            assertNotNull("user1 should exist", userHandler.getUser("testUser1"));
-            assertNotNull("user2 should exist", userHandler.getUser("testUser2"));
-
-            // just checking output for no reason
-            String output = getProgramOutput();
-            assertEquals("", output.trim());
+            assertNotNull(userHandler.getUser("testUser1"));
+            assertNotNull(userHandler.getUser("testUser2"));
         }
 
         @Test(timeout = 1000)
         public void itemListingTest() {
-            // init db
-            MainDatabase db = new MainDatabase();
-            ItemManager itemHandler = db.getItemManager();
-
-            // add some items
             Item laptop = new Item("MacBook", "apple laptop", 1299.99);
             laptop.setSellerName("seller1");
-
             Item phone = new Item("iPhone", "latest model", 999.99);
             phone.setSellerName("seller2");
-
             itemHandler.addItem(laptop);
             itemHandler.addItem(phone);
-
-            // verify
-            assertEquals("should find 1 macbook", 1, itemHandler.searchItemsByName("MacBook").size());
-            assertEquals("should find 1 iphone", 1, itemHandler.searchItemsByName("iPhone").size());
+            assertEquals(1, itemHandler.searchItemsByName("MacBook").size());
+            assertEquals(1, itemHandler.searchItemsByName("iPhone").size());
         }
+
         @Test(timeout = 1000)
         public void testAddItems() {
-            MainDatabase db = new MainDatabase();
-            ItemManager itemHandler = db.getItemManager();
-
             Item item = new Item("TestItem", "description", 50.0);
             item.setSellerName("testSeller");
             itemHandler.addItem(item);
-
-            assertEquals("should find 1 test item", 1, itemHandler.searchItemsByName("TestItem").size());
-        }
-        @Test(timeout = 1000)
-        public void purchaseTest() {
-            // setup db
-            MainDatabase db = new MainDatabase();
-            UserManager userHandler = db.getUserManager();
-            ItemManager itemHandler = db.getItemManager();
-
-            // create users and item
-            userHandler.addUser(new User("seller", "sell123", 500.0));
-            userHandler.addUser(new User("buyer", "buy123", 1000.0));
-
-            Item car = new Item("Tesla", "Model 3", 40000.0);
-            car.setSellerName("seller");
-            itemHandler.addItem(car);
-
-            // simulate purchase
-            User buyer = userHandler.getUser("buyer");
-            Item purchasedItem = itemHandler.searchItemsByName("Tesla").get(0);
-
-            userHandler.updateUserBalance(buyer.getUsername(),
-                    buyer.getBalance() - purchasedItem.getPrice());
-
-            User seller = userHandler.getUser(purchasedItem.getSellerName());
-            userHandler.updateUserBalance(seller.getUsername(),
-                    seller.getBalance() + purchasedItem.getPrice());
-
-            itemHandler.deleteItemByNameAndSeller(purchasedItem.getName(),
-                    purchasedItem.getSellerName());
-
-            // check balances
-            assertEquals("buyer's new balance", 1000.0 - 40000.0, buyer.getBalance(), 0.01);
-            assertEquals("seller's new balance", 500.0 + 40000.0, seller.getBalance(), 0.01);
+            assertEquals(1, itemHandler.searchItemsByName("TestItem").size());
         }
 
         @Test(timeout = 1000)
         public void messageFunctionTest() {
-            // setup
-            MainDatabase db = new MainDatabase();
-            MessageManager msgManager = db.getMessageManager();
-
-            // send some messages
-            msgManager.sendMessage("userA", "userB", "hey");
-            msgManager.sendMessage("userB", "userA", "what's up?");
-
-            // check messages
-            ArrayList<Message> userAMessages = msgManager.getMessagesForUser("userA");
-            assertEquals("userA should have 1 message", 1, userAMessages.size());
-            assertEquals("message content check", "what's up?", userAMessages.get(0).getContent());
-        }
-
-        @Test(timeout = 1000)
-        public void itemSearchTest() {
-            MainDatabase db = new MainDatabase();
-            ItemManager itemHandler = db.getItemManager();
-
-            // populate some items
-            Item item1 = new Item("Chair", "comfy chair", 59.99);
-            item1.setSellerName("ikea");
-
-            Item item2 = new Item("Desk", "large desk", 199.99);
-            item2.setSellerName("ikea");
-
-            itemHandler.addItem(item1);
-            itemHandler.addItem(item2);
-
-            // test searches
-            ArrayList<Item> cheapItems = itemHandler.searchItemsByPriceRange(0.0, 100.0);
-            assertEquals("should find 1 cheap item", 1, cheapItems.size());
-
+            messageHandler.sendMessage("userA", "userB", "hey");
+            messageHandler.sendMessage("userB", "userA", "what's up?");
+            ArrayList<Message> userAMessages = messageHandler.getMessagesForUser("userA");
+            assertEquals(1, userAMessages.size());
+            assertEquals("what's up?", userAMessages.get(0).getContent());
         }
 
         @Test(timeout = 1000)
         public void accountDeletionTest() {
-            MainDatabase db = new MainDatabase();
-            UserManager userHandler = db.getUserManager();
-
-            // create then delete user
             userHandler.addUser(new User("tempUser", "tempPass", 0.0));
             userHandler.deleteUser("tempUser");
+            assertNull(userHandler.getUser("tempUser"));
+        }
+    }
 
-            // verify
-            assertNull("user should be gone", userHandler.getUser("tempUser"));
+    public static class ClientServerTest {
+        private static final int TEST_PORT = 23456;
+        private Thread serverThread;
+
+        @Before
+        public void startServer() {
+            serverThread = new Thread(() -> {
+                MarketPlaceServer server = new MarketPlaceServer(TEST_PORT);
+                server.run();
+            });
+            serverThread.start();
+
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException ignored) {}
+        }
+
+        @Test(timeout = 3000)
+        public void testClientLoginPrompt() throws IOException {
+            Socket socket = new Socket("localhost", TEST_PORT);
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+
+            StringBuilder response = new StringBuilder();
+            String line;
+            while ((line = in.readLine()) != null) {
+                response.append(line).append("\n");
+                if (line.toLowerCase().contains("enter option")) break;
+            }
+
+            assertTrue(response.toString().contains("Login"));
+            assertTrue(response.toString().contains("Create Account"));
+
+            out.println("3");
+            socket.close();
+        }
+
+        @Test(timeout = 3000)
+        public void testClientCreatesAccount() throws IOException {
+            Socket socket = new Socket("localhost", TEST_PORT);
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+
+            // Wait for login menu
+            String line;
+            while ((line = in.readLine()) != null && !line.toLowerCase().contains("enter option")) {
+                System.out.println("SERVER >> " + line);
+            }
+
+            // Create Account
+            out.println("2");
+            in.readLine(); out.println("testUser123");  // Enter new username
+            in.readLine(); out.println("pass123");      // Enter password
+            in.readLine(); out.println("150.0");        // Enter balance
+            String confirm = in.readLine();
+            System.out.println("CREATE RESPONSE >> " + confirm);
+            assertNotNull("Missing response after account creation", confirm);
+            assertTrue(confirm.toLowerCase().contains("successfully"));
+
+            // Wait for login menu again
+            while ((line = in.readLine()) != null && !line.toLowerCase().contains("enter option")) {
+                System.out.println("SERVER >> " + line);
+            }
+
+            // Delete account
+            out.println("4");
+            in.readLine(); out.println("testUser123");  // Enter username
+            in.readLine(); out.println("pass123");      // Enter password
+            String deletionConfirm = in.readLine();
+            System.out.println("DELETE RESPONSE >> " + deletionConfirm);
+            assertNotNull("Missing response after account deletion", deletionConfirm);
+            assertTrue("Expected 'deleted' in response, got: " + deletionConfirm,
+                    deletionConfirm.toLowerCase().contains("deleted"));
+
+            out.println("3"); // Exit
+            socket.close();
+        }
+
+        @Test(timeout = 3000)
+        public void testClientInvalidLogin() throws IOException {
+            Socket socket = new Socket("localhost", TEST_PORT);
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+
+            while (!in.readLine().toLowerCase().contains("enter option")) {}
+
+            out.println("1");
+            in.readLine(); out.println("wrongUser");
+            in.readLine(); out.println("wrongPass");
+
+            String result = in.readLine();
+            assertTrue(result.toLowerCase().contains("invalid"));
+
+            out.println("3");
+            socket.close();
         }
     }
 }

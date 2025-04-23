@@ -10,9 +10,11 @@ import java.util.ArrayList;
  */
 public class MessageManager implements MessageInterface {
     private ArrayList<Message> messages = new ArrayList<>();
-    private final String messagesFile = "messages.txt";
+    private String messagesFile = "messages.txt";
 
-    public MessageManager() {
+    public MessageManager(String messagesFile)
+    {
+        this.messagesFile = messagesFile;
         loadMessages();
     }
 

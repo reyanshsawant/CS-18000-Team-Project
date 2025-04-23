@@ -10,9 +10,9 @@ import java.util.Scanner;
  */
 public class Main {
     public static void main(String[] args) {
-        UserManager userManager = new UserManager();
-        ItemManager itemManager = new ItemManager();
-        MessageManager messageManager = new MessageManager();
+        UserManager userManager = new UserManager("users.txt");
+        ItemManager itemManager = new ItemManager("items.txt");
+        MessageManager messageManager = new MessageManager("messages.txt");
         RatingManager ratingManager = new RatingManager();
         SoldItemManager soldItemManager = new SoldItemManager();
         Scanner scanner = new Scanner(System.in);

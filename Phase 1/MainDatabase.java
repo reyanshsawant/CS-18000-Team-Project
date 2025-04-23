@@ -13,9 +13,9 @@ public class MainDatabase {
     private MessageManager messageManager;
 
     public MainDatabase() {
-        userManager = new UserManager();
-        itemManager = new ItemManager();
-        messageManager = new MessageManager();
+        userManager = new UserManager("users.txt");
+        itemManager = new ItemManager("items.txt");
+        messageManager = new MessageManager("messages.txt");
     }
 
     //getters for managers

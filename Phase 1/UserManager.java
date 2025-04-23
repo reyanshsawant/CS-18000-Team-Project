@@ -10,9 +10,10 @@ import java.util.ArrayList;
  */
 public class UserManager {
     private ArrayList<User> users = new ArrayList<>();
-    private final String usersFile = "users.txt";
+    private String usersFile = "users.txt";
 
-    public UserManager() {
+    public UserManager(String usersFile) {
+        this.usersFile = usersFile;
         loadUsers();
     }
 
@@ -77,7 +78,7 @@ public class UserManager {
     }
 
     // Save users to the users.txt file
-    private void saveUsers() {
+    public void saveUsers() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(usersFile))) {
             for (User user : users) {
                 writer.write(user.getUsername() + "," + user.getPassword() + "," + user.getBalance());

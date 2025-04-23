@@ -1,6 +1,16 @@
 import java.io.*;
 import java.util.ArrayList;
 
+/**
+ * Rating Manager
+ *
+ * Purdue University -- CS18000 -- Spring 2025 -- Team Project01
+ *
+ * @author Nikhil
+ * @version April 17th, 2025
+ */
+
+
 public class RatingManager {
     private final String ratingsFile = "ratings.txt";
 

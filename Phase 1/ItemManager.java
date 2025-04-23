@@ -11,9 +11,11 @@ import java.util.ArrayList;
 public class ItemManager {
     private ArrayList<Item> items = new ArrayList<>();
     private int itemIdCounter = 0;
-    private final String itemsFile = "items.txt";
+    private String itemsFile = "items.txt";
 
-    public ItemManager() {
+    public ItemManager(String itemsFile)
+    {
+        this.itemsFile = itemsFile;
         loadItems();
     }
 

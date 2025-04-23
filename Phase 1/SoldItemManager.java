@@ -1,5 +1,13 @@
 import java.io.*;
 import java.util.ArrayList;
+/**
+ * ItemManager Class
+ *
+ * Purdue University -- CS18000 -- Spring 2025 -- Team Project01
+ *
+ * @author Nikhil
+ * @version April 6th, 2025
+ */
 
 public class SoldItemManager {
     private final String soldItemsFile = "sold_items.txt";
