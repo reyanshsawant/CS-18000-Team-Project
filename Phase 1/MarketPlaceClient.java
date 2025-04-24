@@ -1,0 +1,69 @@
+import java.io.*;
+import java.net.Socket;
+import java.util.Scanner;
+
+/**
+ * Market Place Client
+ *
+ * Purdue University -- CS18000 -- Spring 2025 -- Team Project01
+ *
+ * @author Reyansh Sawant
+ * @version April 14th, 2025
+ */
+
+public class MarketPlaceClient {
+    private Socket socket;
+    private PrintWriter out;
+    private BufferedReader in;
+
+    public MarketPlaceClient(String host, int port) {
+        try {
+            this.socket = new Socket(host, port);
+            this.out = new PrintWriter(socket.getOutputStream(), true);
+            this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        } catch (IOException e) {
+            System.out.println("Unable to connect to server: " + e.getMessage());
+        }
+    }
+
+    public void start() {
+        if (socket == null || out == null || in == null) {
+            System.out.println("Client not properly initialized.");
+            return;
+        }
+
+        try (Scanner scanner = new Scanner(System.in)) {
+            while (true) {
+                StringBuilder block = new StringBuilder();
+                String line;
+
+                while ((line = in.readLine()) != null) {
+                    block.append(line).append("\n");
+                    if (line.trim().endsWith(":")) {
+                        break;
+                    }
+                }
+
+                // Show server output
+                System.out.print(block.toString());
+
+                // Get user input
+                String userInput = scanner.nextLine();
+                out.println(userInput);
+            }
+        } catch (IOException e) {
+            System.out.println("Disconnected from server.");
+        } finally {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                System.out.println("Error closing socket: " + e.getMessage());
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        MarketPlaceClient client = new MarketPlaceClient("localhost", 55555);
+        client.start();
+    }
+}
