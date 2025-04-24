@@ -62,5 +62,5 @@ public class User implements UserInterface {
     public void setBalance(double balance) {
         this.balance = balance;
     }
-    
+
 }

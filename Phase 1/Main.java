@@ -10,9 +10,11 @@ import java.util.Scanner;
  */
 public class Main {
     public static void main(String[] args) {
-        UserManager userManager = new UserManager();
-        ItemManager itemManager = new ItemManager();
-        MessageManager messageManager = new MessageManager();
+        UserManager userManager = new UserManager("users.txt");
+        ItemManager itemManager = new ItemManager("items.txt");
+        MessageManager messageManager = new MessageManager("messages.txt");
+        RatingManager ratingManager = new RatingManager();
+        SoldItemManager soldItemManager = new SoldItemManager();
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Welcome to the Marketplace!");
@@ -58,7 +60,7 @@ public class Main {
                                     System.out.print("Enter your response: ");
                                     String replyContent = scanner.nextLine();
                                     Message reply = new Message(currentUser.getUsername(),
-                                     message.getSender(), replyContent);
+                                            message.getSender(), replyContent);
                                     messageManager.addMessage(reply);
                                     System.out.println("Response sent!");
 
@@ -133,6 +135,11 @@ public class Main {
             System.out.println("6. Message a seller");
             System.out.println("7. View messages");
             System.out.println("8. Log out");
+            System.out.println("9. Rate a seller");
+            System.out.println("10. Check seller rating");
+            System.out.println("11. Search for items by category");
+            System.out.println("12. Search for seller");
+            System.out.println("13. View your previously sold items");
             System.out.print("Enter your choice: ");
             int choice = scanner.nextInt();
             scanner.nextLine(); // Consume newline
@@ -147,17 +154,24 @@ public class Main {
                     System.out.print("Enter item price: ");
                     double itemPrice = scanner.nextDouble();
                     scanner.nextLine(); // Consume newline
+
+                    System.out.print("Enter item category: ");
+                    String itemCategory = scanner.nextLine();
+
                     System.out.print("Enter picture file path (or leave blank): ");
                     String picturePath = scanner.nextLine();
 
-                    Item newItem = new Item(itemName, itemDescription, itemPrice);
+                    // Create item with category
+                    Item newItem = new Item(itemName, itemDescription, itemPrice, itemCategory);
                     newItem.setSeller(currentUser.getUsername());
                     if (!picturePath.isEmpty()) {
                         newItem.setPicturePath(picturePath);
                     }
+
                     itemManager.addItem(newItem);
                     System.out.println("Item listed successfully!");
                     break;
+
 
                 case 2:
                     // Delete an item
@@ -178,8 +192,8 @@ public class Main {
                     } else {
                         System.out.println("Available items:");
                         for (Item item : items) {
-                            System.out.println("- " + item.getName() + " ($" + item.getPrice() + ") - Seller: " 
-                            + item.getSeller());
+                            System.out.println("- " + item.getName() + " ($" + item.getPrice() + ") - Seller: "
+                                    + item.getSeller());
                             if (item.getPicturePath() != null) {
                                 System.out.println("  Picture: " + item.getPicturePath());
                             }
@@ -202,7 +216,7 @@ public class Main {
                     for (int i = 0; i < buyItems.size(); i++) {
                         Item item = buyItems.get(i);
                         System.out.println((i + 1) + ". " + item.getName() + " - $" + item.getPrice() +
-                         " (Seller: " + item.getSeller() + ")");
+                                " (Seller: " + item.getSeller() + ")");
                     }
 
                     System.out.print("Enter the number of the item you want to buy: ");
@@ -228,12 +242,13 @@ public class Main {
 
                     // Perform the transaction
                     userManager.updateUserBalance(currentUser.getUsername(), currentUser.getBalance()
-                     - selectedItem.getPrice());
-                    userManager.updateUserBalance(seller.getUsername(), seller.getBalance() + 
-                    selectedItem.getPrice());
+                            - selectedItem.getPrice());
+                    userManager.updateUserBalance(seller.getUsername(), seller.getBalance() +
+                            selectedItem.getPrice());
                     itemManager.removeItem(selectedItem.getItemId());
+                    soldItemManager.recordSale(selectedItem);
                     System.out.println("Purchase successful! You bought " + selectedItem.getName()
-                     + " for $" + selectedItem.getPrice());
+                            + " for $" + selectedItem.getPrice());
                     break;
 
                 case 5:
@@ -252,7 +267,7 @@ public class Main {
                             double amountToAdd = scanner.nextDouble();
                             scanner.nextLine(); // Consume newline
                             userManager.updateUserBalance(currentUser.getUsername(),
-                             currentUser.getBalance() + amountToAdd);
+                                    currentUser.getBalance() + amountToAdd);
                             System.out.println("Balance updated successfully!");
                         } else if (balanceChoice == 2) {
                             System.out.print("Enter amount to remove: ");
@@ -260,7 +275,7 @@ public class Main {
                             scanner.nextLine(); // Consume newline
                             if (currentUser.getBalance() >= amountToRemove) {
                                 userManager.updateUserBalance(currentUser.getUsername(),
-                                 currentUser.getBalance() - amountToRemove);
+                                        currentUser.getBalance() - amountToRemove);
                                 System.out.println("Balance updated successfully!");
                             } else {
                                 System.out.println("Insufficient balance.");
@@ -308,6 +323,119 @@ public class Main {
                     System.out.println("Logging out. Goodbye, " + currentUser.getUsername() + "!");
                     currentUser = null;
                     return;
+                case 9:
+                    System.out.print("Enter the seller's username to rate: ");
+                    String sellerToRate = scanner.nextLine();
+                    User sellerCheck = userManager.getUser(sellerToRate);
+
+                    if (sellerCheck == null) {
+                        System.out.println("Seller not found.");
+                        break;
+                    }
+
+                    System.out.print("Enter a rating (1 to 5): ");
+                    int rating = scanner.nextInt();
+                    scanner.nextLine(); // Consume newline
+
+                    if (rating < 1 || rating > 5) {
+                        System.out.println("Invalid rating. Please enter a value between 1 and 5.");
+                    } else {
+                        ratingManager.addRating(sellerToRate, rating);
+                        System.out.println("Rating submitted successfully!");
+                    }
+                    break;
+                case 10:
+                    System.out.print("Enter the seller's username to view their rating: ");
+                    String sellerToCheck = scanner.nextLine();
+                    User sellerExists = userManager.getUser(sellerToCheck);
+
+                    if (sellerExists == null) {
+                        System.out.println("Seller not found.");
+                        break;
+                    }
+
+                    double avgRating = ratingManager.getAverageRating(sellerToCheck);
+                    if (avgRating == 0.0) {
+                        System.out.println("No ratings yet for this seller.");
+                    } else {
+                        System.out.printf("Average rating for %s: %.2f stars%n", sellerToCheck, avgRating);
+                    }
+                    break;
+                case 11:
+                    System.out.print("Enter the category to search: ");
+                    String searchCategory = scanner.nextLine().toLowerCase();
+                    ArrayList<Item> categoryResults = new ArrayList<>();
+                    for (Item item : itemManager.searchItemsByName("")) { // get all items
+                        if (item.getCategory() != null && item.getCategory().toLowerCase().contains(searchCategory)) {
+                            categoryResults.add(item);
+                        }
+                    }
+
+                    if (categoryResults.isEmpty()) {
+                        System.out.println("No items found in that category.");
+                    } else {
+                        System.out.println("Items found in category '" + searchCategory + "':");
+                        for (Item item : categoryResults) {
+                            System.out.println("- " + item.getName() + " ($" + item.getPrice() + ") - Seller: "
+                                    + item.getSeller());
+                        }
+                    }
+                    break;
+                case 12:
+                    System.out.print("Enter the seller's username to search: ");
+                    String sellerSearchName = scanner.nextLine();
+                    User sellerUserCheck = userManager.getUser(sellerSearchName);
+
+                    if (sellerUserCheck == null) {
+                        System.out.println("Seller not found.");
+                        break;
+                    }
+
+                    // Get and display rating
+                    double sellerRating = ratingManager.getAverageRating(sellerSearchName);
+                    if (sellerRating == 0.0) {
+                        System.out.println("Seller '" + sellerSearchName + "' has no ratings yet.");
+                    } else {
+                        System.out.printf("Average rating for %s: %.2f stars%n", sellerSearchName, sellerRating);
+                    }
+
+                    // Show items listed by seller
+                    ArrayList<Item> sellerItems = new ArrayList<>();
+                    for (Item item : itemManager.searchItemsByName("")) { // all items
+                        if (item.getSeller().equals(sellerSearchName)) {
+                            sellerItems.add(item);
+                        }
+                    }
+
+                    if (sellerItems.isEmpty()) {
+                        System.out.println("Seller has no active items.");
+                    } else {
+                        System.out.println("Items currently listed by " + sellerSearchName + ":");
+                        for (Item item : sellerItems) {
+                            System.out.println("- " + item.getName() + " ($" + item.getPrice() + ")");
+                            if (item.getCategory() != null) {
+                                System.out.println("  Category: " + item.getCategory());
+                            }
+                        }
+                    }
+                    break;
+                case 13:
+                    ArrayList<Item> soldItems = soldItemManager.getSoldItemsBySeller(currentUser.getUsername());
+
+                    if (soldItems.isEmpty()) {
+                        System.out.println("You haven’t sold any items yet.");
+                    } else {
+                        System.out.println("Your sold items:");
+                        for (Item item : soldItems) {
+                            System.out.println("- " + item.getName() + " ($" + item.getPrice() + ")");
+                            System.out.println("  Description: " + item.getDescription());
+                            if (item.getCategory() != null) {
+                                System.out.println("  Category: " + item.getCategory());
+                            }
+                        }
+                    }
+                    break;
+
 
                 default:
                     System.out.println("Invalid choice.");

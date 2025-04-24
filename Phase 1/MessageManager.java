@@ -10,9 +10,11 @@ import java.util.ArrayList;
  */
 public class MessageManager implements MessageInterface {
     private ArrayList<Message> messages = new ArrayList<>();
-    private final String messagesFile = "messages.txt";
+    private String messagesFile = "messages.txt";
 
-    public MessageManager() {
+    public MessageManager(String messagesFile)
+    {
+        this.messagesFile = messagesFile;
         loadMessages();
     }
 
@@ -60,8 +62,8 @@ public class MessageManager implements MessageInterface {
         ArrayList<String> userMessages = new ArrayList<>();
         for (Message message : messages) {
             if (message.getReceiver().equals(username)) {
-                userMessages.add("[" + message.getTimestamp() + "] " 
-                    + message.getSender() + ": " + message.getContent());
+                userMessages.add("[" + message.getTimestamp() + "] "
+                        + message.getSender() + ": " + message.getContent());
             }
         }
         return userMessages.toArray(new String[0]); // Convert list to array
