@@ -39,17 +39,29 @@ public class MarketPlaceClient {
 
                 while ((line = in.readLine()) != null) {
                     block.append(line).append("\n");
-                    if (line.trim().endsWith(":")) {
+                    if (line.trim().endsWith(":") || line.toLowerCase().contains("goodbye!")) {
                         break;
                     }
+                }
+
+                // If server has closed the connection
+                if (line == null) {
+                    System.out.println("Server disconnected.");
+                    break;
                 }
 
                 // Show server output
                 System.out.print(block.toString());
 
+                // Exit if the server said goodbye
+                if (block.toString().toLowerCase().contains("goodbye!")) {
+                    break;
+                }
+
                 // Get user input
                 String userInput = scanner.nextLine();
                 out.println(userInput);
+                out.flush(); // ensure input is sent immediately
             }
         } catch (IOException e) {
             System.out.println("Disconnected from server.");

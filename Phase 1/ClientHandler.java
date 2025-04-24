@@ -32,6 +32,8 @@ public class ClientHandler implements Runnable {
         this.soldItemManager = soldItemManager;
     }
 
+    private boolean exit = false;
+
     @Override
     public void run() {
         try (
@@ -43,7 +45,12 @@ public class ClientHandler implements Runnable {
                 out.println("\n1. Login\n2. Create Account\n3. Exit\n4. Delete Account \nEnter option:");
                 String input = in.readLine();
 
-                if (input == null || input.equals("3")) break;
+                if (input == null || input.equals("3")) {
+                    out.println("Goodbye!");
+                    out.flush();
+                    exit = true;
+                    return;
+                }
 
                 switch (input) {
                     case "1":
@@ -107,7 +114,7 @@ public class ClientHandler implements Runnable {
     }
 
     private void showMainMenu(BufferedReader in, PrintWriter out) throws IOException {
-        while (true) {
+        while (!exit) {
             out.println();
             out.println("1. List Item");
             out.println("2. Search Item");
