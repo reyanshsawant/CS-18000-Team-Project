@@ -1,4 +1,7 @@
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 
@@ -126,7 +129,8 @@ public class ClientHandler implements Runnable {
             out.println("8. View Sold Items");
             out.println("9. Search By Category");
             out.println("10. Search by Seller");
-            out.println("11. Logout");
+            out.println("11. Delete Listing");
+            out.println("12. Logout");
             out.println("Enter option:");
             out.flush();
             String input = in.readLine();
@@ -136,8 +140,21 @@ public class ClientHandler implements Runnable {
                     String name = in.readLine();
                     out.println("Enter description:");
                     String desc = in.readLine();
-                    out.println("Enter price:");
-                    double price = Double.parseDouble(in.readLine());
+
+                    double price = -1; // Initialize with an invalid price
+                    while (price < 0) { // Loop until a valid non-negative price is entered
+                        out.println("Enter price:");
+                        try {
+                            price = Double.parseDouble(in.readLine());
+                            if (price < 0) {
+                                out.println("Price cannot be negative. Please enter a valid price.");
+                            }
+                        } catch (NumberFormatException e) {
+                            out.println("Invalid input. Please enter a valid number for the price.");
+                            price = -1; // Reset price to ensure loop continues
+                        }
+                    }
+
                     out.println("Enter category:");
                     String category = in.readLine();
 
@@ -169,6 +186,13 @@ public class ClientHandler implements Runnable {
                     Item selected = buyItems.get(0);
                     User buyer = userManager.getUser(currentUser);
                     User seller = userManager.getUser(selected.getSeller());
+
+                    // Add check to prevent buying own item
+                    if (currentUser.equals(selected.getSeller())) {
+                        out.println("You cannot buy your own item.");
+                        break;
+                    }
+
                     if (buyer.getBalance() < selected.getPrice()) {
                         out.println("Insufficient balance.");
                         break;
@@ -242,7 +266,25 @@ public class ClientHandler implements Runnable {
                         }
                     }
                     break;
-                case "11":
+                case "11": // Handle Delete Listing
+                    out.println("Enter the name of the item you want to delete:");
+                    String deleteItemName = in.readLine();
+                    // Check if item exists and belongs to the current user before deleting
+                    ArrayList<Item> userItems = itemManager.searchItemsByName(deleteItemName);
+                    boolean found = false;
+                    for (Item userItem : userItems) {
+                        if (userItem.getSeller().equals(currentUser) && userItem.getName().equalsIgnoreCase(deleteItemName)) {
+                            itemManager.deleteItemByNameAndSeller(deleteItemName, currentUser);
+                            out.println("Item deleted successfully!");
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        out.println("Item not found or you do not own this item.");
+                    }
+                    break;
+                case "12": // Updated case for Logout
                     currentUser = null;
                     out.println("Logged out.");
                     return;

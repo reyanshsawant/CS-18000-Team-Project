@@ -9,7 +9,7 @@
 
 public class ServerMain {
     public static void main(String[] args) {
-        MarketPlaceServer server = new MarketPlaceServer(12345);
+        MarketPlaceServer server = new MarketPlaceServer(15000);
         new Thread(server).start();
     }
 }

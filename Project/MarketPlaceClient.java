@@ -78,7 +78,7 @@ public class MarketPlaceClient {
     }
 
     public static void main(String[] args) {
-        MarketPlaceClient client = new MarketPlaceClient("localhost", 12345);
+        MarketPlaceClient client = new MarketPlaceClient("localhost", 15000);
         client.start();
     }
 }
