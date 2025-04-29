@@ -30,9 +30,9 @@ public class LoginFrame extends JFrame {
     private JButton loginButton;
     private JButton registerButton;
     private JButton deleteButton; // Added delete button
-    private MarketplaceGUI guiManager; // Reference to the main GUI controller
+    private MarketPlaceGUI guiManager; // Reference to the main GUI controller
 
-    public LoginFrame(MarketplaceGUI guiManager) {
+    public LoginFrame(MarketPlaceGUI guiManager) {
         this.guiManager = guiManager;
 
         setTitle("Marketplace Login / Register");

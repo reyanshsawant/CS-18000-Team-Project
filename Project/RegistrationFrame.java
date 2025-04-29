@@ -30,9 +30,9 @@ public class RegistrationFrame extends JFrame {
     private JTextField balanceField;
     private JButton registerButton;
     private JButton backButton;
-    private MarketplaceGUI guiManager;
+    private MarketPlaceGUI guiManager;
 
-    public RegistrationFrame(MarketplaceGUI guiManager) {
+    public RegistrationFrame(MarketPlaceGUI guiManager) {
         this.guiManager = guiManager;
 
         setTitle("Create Marketplace Account");

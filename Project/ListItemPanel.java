@@ -25,7 +25,7 @@ import javax.swing.JTextField;
  */
 public class ListItemPanel extends JPanel {
 
-    private MarketplaceGUI guiManager;
+    private MarketPlaceGUI guiManager;
 
     private JTextField nameField;
     private JTextArea descriptionArea; // Use JTextArea for potentially longer descriptions
@@ -33,7 +33,7 @@ public class ListItemPanel extends JPanel {
     private JTextField categoryField;
     private JButton listButton;
 
-    public ListItemPanel(MarketplaceGUI guiManager) {
+    public ListItemPanel(MarketPlaceGUI guiManager) {
         this.guiManager = guiManager;
 
         setLayout(new GridBagLayout());

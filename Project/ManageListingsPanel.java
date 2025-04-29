@@ -27,13 +27,13 @@ import javax.swing.table.DefaultTableModel;
  */
 public class ManageListingsPanel extends JPanel {
 
-    private MarketplaceGUI guiManager;
+    private MarketPlaceGUI guiManager;
     private JTable listingsTable;
     private DefaultTableModel tableModel;
     private JButton refreshButton;
     private JButton deleteButton;
 
-    public ManageListingsPanel(MarketplaceGUI guiManager) {
+    public ManageListingsPanel(MarketPlaceGUI guiManager) {
         this.guiManager = guiManager;
 
         setLayout(new BorderLayout(10, 10));

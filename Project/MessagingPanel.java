@@ -27,7 +27,7 @@ import javax.swing.SwingUtilities;
  */
 public class MessagingPanel extends JPanel {
 
-    private MarketplaceGUI guiManager;
+    private MarketPlaceGUI guiManager;
 
     private JTextArea receivedMessagesArea;
     private JTextField recipientField;
@@ -35,7 +35,7 @@ public class MessagingPanel extends JPanel {
     private JButton sendButton;
     private JButton refreshButton;
 
-    public MessagingPanel(MarketplaceGUI guiManager) {
+    public MessagingPanel(MarketPlaceGUI guiManager) {
         this.guiManager = guiManager;
 
         setLayout(new BorderLayout(10, 10));

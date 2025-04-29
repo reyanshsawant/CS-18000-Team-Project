@@ -19,7 +19,7 @@ import javax.swing.SwingUtilities;
  * @author Neil Lapsia
  * @version April 21, 2025
  */
-public class MarketplaceGUI implements GuiCallback {
+public class MarketPlaceGUI implements GuiCallback {
 
     private MarketPlaceClient client;
     private LoginFrame loginFrame;
@@ -49,7 +49,7 @@ public class MarketplaceGUI implements GuiCallback {
     // Example: "From: SenderName - Message Content"
     private static final Pattern MESSAGE_PATTERN = Pattern.compile("^From: (.*) - (.*)$");
 
-    public MarketplaceGUI() {
+    public MarketPlaceGUI() {
         loginFrame = new LoginFrame(this);
         registrationFrame = new RegistrationFrame(this);
         // Client is created on demand in startClientOrReconnect
@@ -556,7 +556,7 @@ public class MarketplaceGUI implements GuiCallback {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            MarketplaceGUI gui = new MarketplaceGUI();
+            MarketPlaceGUI gui = new MarketPlaceGUI();
             // Call the renamed method for initial start
             gui.startClientOrReconnect(); 
         });

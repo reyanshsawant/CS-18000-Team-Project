@@ -20,12 +20,12 @@ import javax.swing.SwingUtilities;
  */
 public class AccountPanel extends JPanel {
 
-    private MarketplaceGUI guiManager;
+    private MarketPlaceGUI guiManager;
     private JLabel balanceLabel;
     private JLabel balanceValueLabel;
     private JButton checkBalanceButton;
 
-    public AccountPanel(MarketplaceGUI guiManager) {
+    public AccountPanel(MarketPlaceGUI guiManager) {
         this.guiManager = guiManager;
 
         setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10)); // Simple left-aligned flow layout

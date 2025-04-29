@@ -10,7 +10,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
@@ -27,12 +26,11 @@ import javax.swing.JTabbedPane;
  */
 public class MarketplaceDashboard extends JFrame {
 
-    private MarketplaceGUI guiManager;
+    private MarketPlaceGUI guiManager;
     private String username;
 
     private JTabbedPane tabbedPane;
     private JButton logoutButton;
-    private JButton deleteAccountButton;
 
     // Panels for each tab
     private SearchBuyPanel searchBuyPanel;
@@ -41,7 +39,7 @@ public class MarketplaceDashboard extends JFrame {
     private MessagingPanel messagingPanel;
     private AccountPanel accountPanel;
 
-    public MarketplaceDashboard(MarketplaceGUI guiManager, String username) {
+    public MarketplaceDashboard(MarketPlaceGUI guiManager, String username) {
         this.guiManager = guiManager;
         this.username = username;
 
@@ -66,9 +64,7 @@ public class MarketplaceDashboard extends JFrame {
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         logoutButton = new JButton("Logout");
-        deleteAccountButton = new JButton("Delete Account");
         buttonPanel.add(logoutButton);
-        buttonPanel.add(deleteAccountButton);
 
         topPanel.add(welcomeLabel, BorderLayout.CENTER);
         topPanel.add(buttonPanel, BorderLayout.EAST);
@@ -110,20 +106,6 @@ public class MarketplaceDashboard extends JFrame {
 
         // Action Listeners ---
         logoutButton.addActionListener(e -> guiManager.requestLogout());
-
-        deleteAccountButton.addActionListener(e -> {
-            // Confirmation dialog is handled within the dashboard
-            int confirmation = JOptionPane.showConfirmDialog(this,
-                "Are you sure you want to permanently delete your account and all listings? This cannot be undone.",
-                "Confirm Account Deletion",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.WARNING_MESSAGE);
-
-            if (confirmation == JOptionPane.YES_OPTION) {
-                // Tell the manager to initiate the deletion process (which currently shows a message)
-                guiManager.requestAccountDeletion();
-            }
-        });
     }
 
     // Helper method remains for other placeholders
@@ -135,42 +117,42 @@ public class MarketplaceDashboard extends JFrame {
         return panel;
     }
 
-    // Method for MarketplaceGUI to call to update the balance display
+    // Method for MarketPlaceGUI to call to update the balance display
     public void updateBalanceDisplay(String balanceText) {
         if (accountPanel != null) {
             accountPanel.setBalance(balanceText);
         }
     }
 
-    // Method for MarketplaceGUI to call after item is listed successfully
+    // Method for MarketPlaceGUI to call after item is listed successfully
     public void clearListItemFields() {
         if (listItemPanel != null) {
             listItemPanel.clearFields();
         }
     }
 
-    // Method for MarketplaceGUI to call to update the search results table
+    // Method for MarketPlaceGUI to call to update the search results table
     public void updateSearchResults(ArrayList<String[]> searchData) {
         if (searchBuyPanel != null) {
             searchBuyPanel.updateSearchResults(searchData);
         }
     }
 
-    // Method for MarketplaceGUI to call to update the user's listings table
+    // Method for MarketPlaceGUI to call to update the user's listings table
     public void updateMyListings(ArrayList<String[]> listingsData) {
         if (manageListingsPanel != null) {
             manageListingsPanel.updateListingsTable(listingsData);
         }
     }
 
-    // Method for MarketplaceGUI to call to display received messages
+    // Method for MarketPlaceGUI to call to display received messages
     public void displayMessages(List<String> messages) {
         if (messagingPanel != null) {
             messagingPanel.displayMessages(messages);
         }
     }
 
-    // Method for MarketplaceGUI to call after sending a message
+    // Method for MarketPlaceGUI to call after sending a message
     public void clearMessageSendFields() {
         if (messagingPanel != null) {
             messagingPanel.clearSendFields();

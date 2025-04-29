@@ -28,14 +28,14 @@ import javax.swing.table.DefaultTableModel;
  */
 public class SearchBuyPanel extends JPanel {
 
-    private MarketplaceGUI guiManager;
+    private MarketPlaceGUI guiManager;
     private JTextField searchField;
     private JButton searchButton;
     private JTable resultsTable;
     private DefaultTableModel tableModel;
     private JButton buyButton;
 
-    public SearchBuyPanel(MarketplaceGUI guiManager) {
+    public SearchBuyPanel(MarketPlaceGUI guiManager) {
         this.guiManager = guiManager;
 
         setLayout(new BorderLayout(10, 10)); // Add gaps between components

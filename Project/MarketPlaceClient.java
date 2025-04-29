@@ -137,7 +137,7 @@ public class MarketPlaceClient {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            MarketplaceGUI gui = new MarketplaceGUI();
+            MarketPlaceGUI gui = new MarketPlaceGUI();
             gui.startClientOrReconnect();
         });
     }
