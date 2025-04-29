@@ -131,6 +131,7 @@ public class ClientHandler implements Runnable {
             out.println("10. Search by Seller");
             out.println("11. Delete Listing");
             out.println("12. Logout");
+            out.println("13. View Balance");
             out.println("Enter option:");
             out.flush();
             String input = in.readLine();
@@ -287,7 +288,17 @@ public class ClientHandler implements Runnable {
                 case "12": // Updated case for Logout
                     currentUser = null;
                     out.println("Logged out.");
+                    exit = true;
                     return;
+                case "13":
+                    User user = userManager.getUser(currentUser);
+                    if (user != null) {
+                        double balance = user.getBalance();
+                        out.printf("Your current balance is: $%.2f%n", balance);
+                    } else {
+                        out.println("Error retrieving user information.");
+                    }
+                    break;
                 default:
                     out.println("Invalid option.");
             }
