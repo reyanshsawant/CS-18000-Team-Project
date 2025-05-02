@@ -296,6 +296,10 @@ public class MarketPlaceGUI implements GuiCallback {
                  showLogin();
              } else if (trimmedMsg.startsWith("Username already exists.")) {
                  JOptionPane.showMessageDialog(registrationFrame, "Username already exists. Please choose another.", "Registration Error", JOptionPane.WARNING_MESSAGE);
+             } else if (trimmedMsg.startsWith("Invalid credentials.")) {
+                 if (loginFrame != null && loginFrame.isVisible()) { 
+                      JOptionPane.showMessageDialog(loginFrame, "Invalid credentials. Account deletion failed.", "Deletion Error", JOptionPane.ERROR_MESSAGE);
+                 } 
              } else if (trimmedMsg.startsWith("Account deleted successfully.")) {
                  JOptionPane.showMessageDialog(null, "Account deleted successfully.", "Account Deleted", JOptionPane.INFORMATION_MESSAGE);
              } else if (trimmedMsg.contains("Item listed.")) {
@@ -619,7 +623,10 @@ public class MarketPlaceGUI implements GuiCallback {
     }
 
      public void attemptDeleteAccount(String username, String password) {
-     
+         clearPreviousRequestState(); // Ensure state is clear
+         System.out.println("GUI: Attempting account deletion for: " + username);
+         // Basic validation already done in LoginFrame, just send command
+         queueUserInput("4", username, password); // Command 4 = Delete Account
      }
      
     public void requestViewMessages() {
