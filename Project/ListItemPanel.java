@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JComboBox;
 
 /**
  * List Item Panel
@@ -30,8 +31,11 @@ public class ListItemPanel extends JPanel {
     private JTextField nameField;
     private JTextArea descriptionArea; // Use JTextArea for potentially longer descriptions
     private JTextField priceField;
-    private JTextField categoryField;
+    private JComboBox<String> categoryComboBox;
     private JButton listButton;
+
+    // Define categories
+    private final String[] CATEGORIES = {"Electronics", "Books", "Clothing", "Home Goods", "Toys", "Sports", "Other"};
 
     public ListItemPanel(MarketPlaceGUI guiManager) {
         this.guiManager = guiManager;
@@ -88,7 +92,7 @@ public class ListItemPanel extends JPanel {
         priceField = new JTextField(10);
         add(priceField, gbc);
 
-         // Row 3: Category 
+         // Row 3: Category (Changed to JComboBox)
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.weightx = 0.0;
@@ -98,8 +102,8 @@ public class ListItemPanel extends JPanel {
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        categoryField = new JTextField(20);
-        add(categoryField, gbc);
+        categoryComboBox = new JComboBox<>(CATEGORIES);
+        add(categoryComboBox, gbc);
 
         // Row 4: List Button 
         gbc.gridx = 0;
@@ -118,12 +122,12 @@ public class ListItemPanel extends JPanel {
                 String name = nameField.getText();
                 String description = descriptionArea.getText();
                 String priceStr = priceField.getText();
-                String category = categoryField.getText();
+                String category = (String) categoryComboBox.getSelectedItem();
 
-                // Basic Validation
-                if (name.trim().isEmpty() || description.trim().isEmpty() || priceStr.trim().isEmpty() || category.trim().isEmpty()) {
+                // Basic Validation (Category selection is always valid if ComboBox has items)
+                if (name.trim().isEmpty() || description.trim().isEmpty() || priceStr.trim().isEmpty() || category == null) { 
                     JOptionPane.showMessageDialog(ListItemPanel.this,
-                            "All fields must be filled.", "Listing Error", JOptionPane.ERROR_MESSAGE);
+                            "All fields must be filled and a category selected.", "Listing Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
@@ -150,6 +154,6 @@ public class ListItemPanel extends JPanel {
         nameField.setText("");
         descriptionArea.setText("");
         priceField.setText("");
-        categoryField.setText("");
+        categoryComboBox.setSelectedIndex(0);
     }
 } 

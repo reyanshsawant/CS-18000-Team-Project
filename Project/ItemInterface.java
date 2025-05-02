@@ -17,6 +17,7 @@ public interface ItemInterface {
     double getPrice();
     String getPicturePath();
     String getSellerName();
+    String getCategory();
 
     void setItemId(int itemId);
     void setName(String name);
@@ -24,4 +25,5 @@ public interface ItemInterface {
     void setPrice(double price);
     void setPicturePath(String picturePath);
     void setSellerName(String sellerName);
+    void setCategory(String category);
 }

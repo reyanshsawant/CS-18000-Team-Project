@@ -132,6 +132,7 @@ public class ClientHandler implements Runnable {
             out.println("11. Delete Listing");
             out.println("12. Logout");
             out.println("13. View Balance");
+            out.println("14. View My Listings");
             out.println("Enter option:");
             out.flush();
             String input = in.readLine();
@@ -172,11 +173,16 @@ public class ClientHandler implements Runnable {
                         out.println("No items found.");
                     } else {
                         for (Item res : results) {
-                            out.println(res.getName() + " - $" + res.getPrice() + " - Seller: " + res.getSeller());
+                            User sellerForItem = userManager.getUser(res.getSellerName());
+                            double avgRating = (sellerForItem != null) ? sellerForItem.getAverageRating() : 0.0;
+                            String ratingStr = (avgRating == 0.0) ? "No ratings" : String.format("%.1f/5 stars", avgRating);
+                            out.println(res.getName() + " - $" + res.getPrice() + 
+                                        " - Seller: " + res.getSellerName() + " (" + ratingStr + ")" +
+                                        " - Category: " + (res.getCategory() != null ? res.getCategory() : "N/A"));
                         }
                     }
                     break;
-                case "3": // Buy Item
+                case "3":
                     out.println("Enter item name to buy:");
                     String itemName = in.readLine();
                     ArrayList<Item> buyItems = itemManager.searchItemsByName(itemName);
@@ -186,24 +192,64 @@ public class ClientHandler implements Runnable {
                     }
                     Item selected = buyItems.get(0);
                     User buyer = userManager.getUser(currentUser);
-                    User seller = userManager.getUser(selected.getSeller());
+                    User seller = userManager.getUser(selected.getSellerName());
 
-                    // Add check to prevent buying own item
-                    if (currentUser.equals(selected.getSeller())) {
+                    if (seller == null) {
+                        out.println("Error: Seller not found.");
+                        break;
+                    }
+                    if (currentUser.equals(selected.getSellerName())) {
                         out.println("You cannot buy your own item.");
                         break;
                     }
-
                     if (buyer.getBalance() < selected.getPrice()) {
                         out.println("Insufficient balance.");
                         break;
                     }
+                    
                     buyer.setBalance(buyer.getBalance() - selected.getPrice());
                     seller.setBalance(seller.getBalance() + selected.getPrice());
                     userManager.saveUsers();
+                    soldItemManager.recordSale(selected, buyer.getUsername());
                     itemManager.removeItem(selected.getItemId());
-                    soldItemManager.recordSale(selected);
-                    out.println("Item purchased. Your new balance: $" + buyer.getBalance());
+                    
+                    out.println("Item purchased successfully. Your new balance: $" + String.format("%.2f", buyer.getBalance()));
+
+                    out.println("Would you like to rate the seller '" + seller.getUsername() + "'? (yes/no)");
+                    out.println("Enter choice:");
+                    out.flush();
+                   
+                    String rateChoice = in.readLine();
+                    if (rateChoice != null && rateChoice.trim().equalsIgnoreCase("yes")) {
+                        int ratingValue = -1;
+                        while (ratingValue < 1 || ratingValue > 5) {
+                            out.println("Enter rating (1-5 stars):");
+                            out.flush();
+                            try {
+                                String ratingInput = in.readLine();
+                                if (ratingInput == null) throw new IOException("Client disconnected during rating.");
+                                ratingValue = Integer.parseInt(ratingInput);
+                                if (ratingValue < 1 || ratingValue > 5) {
+                                    out.println("Invalid rating. Please enter a number between 1 and 5.");
+                                }
+                            } catch (NumberFormatException e) {
+                                out.println("Invalid input. Please enter a number.");
+                                ratingValue = -1;
+                            } catch (IOException ioe) {
+                                 System.out.println("Client disconnected while entering rating.");
+                                 throw ioe;
+                            }
+                        }
+                        if (!soldItemManager.hasBuyerPurchasedFromSeller(currentUser, seller.getUsername())) {
+                             out.println("Rating failed: You must purchase from this seller to rate them.");
+                        } else {
+                            seller.addRating(ratingValue);
+                            userManager.saveUsers();
+                            out.println("Thank you for your rating!");
+                        }
+                    } else {
+                         out.println("Skipping rating.");
+                    }
                     break;
                 case "4":
                     ArrayList<Message> messages = messageManager.getMessagesForUser(currentUser);
@@ -224,53 +270,112 @@ public class ClientHandler implements Runnable {
                     out.println("Message sent.");
                     break;
                 case "6":
-                    out.println("Enter seller username:");
+                    out.println("Enter seller username to rate:");
                     String sellerToRate = in.readLine();
-                    out.println("Enter rating (1-5):");
-                    int rating = Integer.parseInt(in.readLine());
-                    ratingManager.addRating(sellerToRate, rating);
-                    out.println("Rating submitted.");
+                    User userToRate = userManager.getUser(sellerToRate);
+
+                    if (userToRate == null) {
+                        out.println("Seller not found.");
+                        break;
+                    }
+                    if (currentUser.equals(sellerToRate)) {
+                        out.println("You cannot rate yourself.");
+                        break;
+                    }
+                    
+                    if (!soldItemManager.hasBuyerPurchasedFromSeller(currentUser, sellerToRate)) {
+                        out.println("Rating failed: You must purchase from a seller before rating them.");
+                        break;
+                    }
+                    
+                    int rating = -1;
+                    while (rating < 1 || rating > 5) {
+                         out.println("Enter rating (1-5 stars):");
+                         try {
+                            rating = Integer.parseInt(in.readLine());
+                             if (rating < 1 || rating > 5) {
+                                 out.println("Invalid rating. Please enter a number between 1 and 5.");
+                             }
+                         } catch (NumberFormatException e) {
+                             out.println("Invalid input. Please enter a number.");
+                             rating = -1;
+                         }
+                    }
+
+                    userToRate.addRating(rating);
+                    userManager.saveUsers();
+                    out.println("Rating submitted successfully for " + sellerToRate + ".");
                     break;
                 case "7":
-                    out.println("Enter seller username:");
+                    out.println("Enter seller username to view rating:");
                     String sellerToCheck = in.readLine();
-                    double avg = ratingManager.getAverageRating(sellerToCheck);
-                    out.println(avg == 0.0 ? "No ratings." : "Average rating: " + String.format("%.2f", avg));
+                    User userToCheck = userManager.getUser(sellerToCheck);
+
+                    if (userToCheck == null) {
+                        out.println("Seller not found.");
+                    } else {
+                        double avg = userToCheck.getAverageRating();
+                        int numRatings = userToCheck.getNumberOfRatings();
+                        out.println("Seller: " + sellerToCheck);
+                        if (numRatings == 0) {
+                            out.println("Average Rating: No ratings yet.");
+                        } else {
+                            out.println(String.format("Average Rating: %.1f/5 stars (from %d ratings)", avg, numRatings));
+                        }
+                    }
                     break;
                 case "8":
                     ArrayList<Item> soldItems = soldItemManager.getSoldItemsBySeller(currentUser);
                     if (soldItems.isEmpty()) {
-                        out.println("No sold items.");
+                        out.println("You have not sold any items yet.");
                     } else {
+                        out.println("--- Your Sold Items ---");
                         for (Item si : soldItems) {
-                            out.println(si.getName() + " - $" + si.getPrice());
+                             out.println(si.getName() + " - Price: $" + String.format("%.2f", si.getPrice()) +
+                                         " - Category: " + (si.getCategory() != null ? si.getCategory() : "N/A"));
                         }
+                        out.println("-----------------------");
                     }
                     break;
-                case "9": // Search by Category
+                case "9":
                     out.println("Enter category to search:");
                     String categorySearch = in.readLine();
-                    ArrayList<Item> categoryItems = itemManager.searchItemsByName("");
-                    for (Item items : categoryItems) {
-                        if (items.getCategory() != null && items.getCategory().equalsIgnoreCase(categorySearch)) {
-                            out.println(items.getName() + " - $" + items.getPrice() + " - Seller: " + items.getSeller());
+                    ArrayList<Item> categoryItems = itemManager.searchItemsByCategory(categorySearch);
+                    if (categoryItems.isEmpty()) {
+                        out.println("No items found in category: " + categorySearch);
+                    } else {
+                        out.println("--- Items in Category: " + categorySearch + " ---");
+                        for (Item catItem : categoryItems) {
+                            User sellerForItem = userManager.getUser(catItem.getSellerName());
+                            double avgRating = (sellerForItem != null) ? sellerForItem.getAverageRating() : 0.0;
+                            String ratingStr = (avgRating == 0.0) ? "No ratings" : String.format("%.1f/5 stars", avgRating);
+                            out.println(catItem.getName() + " - $" + catItem.getPrice() + 
+                                        " - Seller: " + catItem.getSellerName() + " (" + ratingStr + ")");
                         }
+                         out.println("---------------------------------");
                     }
                     break;
-                case "10": // Search by Seller
-                    out.println("Enter seller username:");
-                    String sellerUsername = in.readLine();
-                    ArrayList<Item> sellerItems = itemManager.searchItemsByName("");
-                    for (Item items : sellerItems) {
-                        if (items.getSeller().equals(sellerUsername)) {
-                            out.println(items.getName() + " - $" + items.getPrice() + " - Category: " + items.getCategory());
+                case "10":
+                    out.println("Enter seller username to search for:");
+                    String sellerQuery = in.readLine();
+                    
+                    ArrayList<User> matchedSellers = userManager.searchUsers(sellerQuery);
+                    if (matchedSellers.isEmpty()) {
+                         out.println("No sellers found matching '" + sellerQuery + "'.");
+                    } else {
+                        out.println("--- Matching Sellers ---");
+                        for (User matchedSeller : matchedSellers) {
+                            double avgRating = matchedSeller.getAverageRating();
+                            int numRatings = matchedSeller.getNumberOfRatings();
+                            String ratingStr = (numRatings == 0) ? "No ratings yet" : String.format("%.1f/5 stars (%d ratings)", avgRating, numRatings);
+                            out.println("Username: " + matchedSeller.getUsername() + " - Rating: " + ratingStr);
                         }
+                         out.println("------------------------");
                     }
                     break;
-                case "11": // Handle Delete Listing
+                case "11":
                     out.println("Enter the name of the item you want to delete:");
                     String deleteItemName = in.readLine();
-                    // Check if item exists and belongs to the current user before deleting
                     ArrayList<Item> userItems = itemManager.searchItemsByName(deleteItemName);
                     boolean found = false;
                     for (Item userItem : userItems) {
@@ -285,7 +390,7 @@ public class ClientHandler implements Runnable {
                         out.println("Item not found or you do not own this item.");
                     }
                     break;
-                case "12": // Updated case for Logout
+                case "12":
                     currentUser = null;
                     out.println("Logged out.");
                     exit = true;
@@ -297,6 +402,23 @@ public class ClientHandler implements Runnable {
                         out.printf("Your current balance is: $%.2f%n", balance);
                     } else {
                         out.println("Error retrieving user information.");
+                    }
+                    break;
+                case "14":
+                    if (currentUser == null) {
+                        out.println("Error: Not logged in.");
+                        break;
+                    }
+                    ArrayList<Item> myListings = itemManager.getItemsBySeller(currentUser);
+                    if (myListings.isEmpty()) {
+                        out.println("You have no active listings.");
+                    } else {
+                        out.println("--- Your Active Listings ---");
+                        for (Item myItem : myListings) {
+                            out.println(myItem.getName() + " - Price: $" + String.format("%.2f", myItem.getPrice()) +
+                                        " - Category: " + (myItem.getCategory() != null ? myItem.getCategory() : "N/A"));
+                        }
+                        out.println("---------------------------");
                     }
                     break;
                 default:

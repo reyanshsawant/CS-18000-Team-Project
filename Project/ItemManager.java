@@ -1,4 +1,9 @@
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 /**
  * ItemManager Class
@@ -86,6 +91,34 @@ public class ItemManager {
         ArrayList<Item> result = new ArrayList<>();
         for (Item item : items) {
             if (item.getPrice() >= minPrice && item.getPrice() <= maxPrice) {
+                result.add(item);
+            }
+        }
+        return result;
+    }
+
+    public synchronized ArrayList<Item> searchItemsByCategory(String category) {
+        ArrayList<Item> result = new ArrayList<>();
+        if (category == null || category.trim().isEmpty()) {
+            return items; // Return all items if category is empty or null
+        }
+        for (Item item : items) {
+            // Case-insensitive comparison, handle null category in item
+            if (item.getCategory() != null && item.getCategory().equalsIgnoreCase(category.trim())) {
+                result.add(item);
+            }
+        }
+        return result;
+    }
+
+    public synchronized ArrayList<Item> getItemsBySeller(String sellerUsername) {
+        ArrayList<Item> result = new ArrayList<>();
+        if (sellerUsername == null || sellerUsername.trim().isEmpty()) {
+            return result; // Return empty list if username is invalid
+        }
+        for (Item item : items) {
+            // Exact match for seller username
+            if (sellerUsername.equals(item.getSellerName())) {
                 result.add(item);
             }
         }

@@ -12,6 +12,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 /**
  * Marketplace Dashboard Frame
@@ -70,22 +72,20 @@ public class MarketplaceDashboard extends JFrame {
         topPanel.add(buttonPanel, BorderLayout.EAST);
         topPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5)); // Add padding
 
-        // Tabbed Pane for Core Functions ---
         tabbedPane = new JTabbedPane();
 
-        // Initialize panels (use specific panels where available)
-        searchBuyPanel = new SearchBuyPanel(guiManager); // Instantiate the actual SearchBuyPanel
-        listItemPanel = new ListItemPanel(guiManager); // Instantiate the actual ListItemPanel
-        manageListingsPanel = new ManageListingsPanel(guiManager); // Instantiate the actual ManageListingsPanel
-        messagingPanel = new MessagingPanel(guiManager); // Instantiate the actual MessagingPanel
-        accountPanel = new AccountPanel(guiManager); // Pass guiManager here
+        searchBuyPanel = new SearchBuyPanel(guiManager);
+        listItemPanel = new ListItemPanel(guiManager);
+        manageListingsPanel = new ManageListingsPanel(guiManager);
+        messagingPanel = new MessagingPanel(guiManager);
+        accountPanel = new AccountPanel(guiManager);
 
         // Add tabs
-        tabbedPane.addTab("Search/Buy", searchBuyPanel); // Add the SearchBuyPanel instance
-        tabbedPane.addTab("List Item", listItemPanel); // Add the ListItemPanel instance
-        tabbedPane.addTab("My Listings", manageListingsPanel); // Add the ManageListingsPanel instance
-        tabbedPane.addTab("Messages", messagingPanel); // Add the MessagingPanel instance
-        tabbedPane.addTab("Account", accountPanel); // Add the AccountPanel instance
+        tabbedPane.addTab("Search/Buy", searchBuyPanel);
+        tabbedPane.addTab("List Item", listItemPanel);
+        tabbedPane.addTab("My Listings", manageListingsPanel);
+        tabbedPane.addTab("Messages", messagingPanel);
+        tabbedPane.addTab("Account", accountPanel);
 
         // Add listener to refresh data when a tab is selected
         tabbedPane.addChangeListener(e -> {
@@ -93,22 +93,30 @@ public class MarketplaceDashboard extends JFrame {
              if (selectedComponent == messagingPanel) {
                  guiManager.requestViewMessages(); // Request messages when tab becomes visible
              } else if (selectedComponent == accountPanel) {
-                 guiManager.requestCheckBalance(); // Request balance when Account tab becomes visible
+                 // Refresh Account Panel data
+                 guiManager.requestCheckBalance();
+                 guiManager.requestViewSoldItems();
+                 if (username != null) {
+                     guiManager.requestViewSellerRating(username); 
+                 }
              } else if (selectedComponent == manageListingsPanel) {
                  guiManager.requestMyListings();
+             } else if (selectedComponent == searchBuyPanel) {
+                // Do nothing for now
+             } else if (selectedComponent == listItemPanel) {
+                // Do nothing for now
              }
         });
 
-        // Main Layout ---
+        // Main Layout
         setLayout(new BorderLayout());
         add(topPanel, BorderLayout.NORTH);
         add(tabbedPane, BorderLayout.CENTER);
 
-        // Action Listeners ---
+        // Action Listeners
         logoutButton.addActionListener(e -> guiManager.requestLogout());
     }
 
-    // Helper method remains for other placeholders
     private JPanel createPlaceholderPanel(String text) {
         JPanel panel = new JPanel(new GridBagLayout());
         JLabel label = new JLabel(text);
@@ -117,49 +125,105 @@ public class MarketplaceDashboard extends JFrame {
         return panel;
     }
 
-    // Method for MarketPlaceGUI to call to update the balance display
     public void updateBalanceDisplay(String balanceText) {
         if (accountPanel != null) {
             accountPanel.setBalance(balanceText);
         }
     }
 
-    // Method for MarketPlaceGUI to call after item is listed successfully
     public void clearListItemFields() {
         if (listItemPanel != null) {
             listItemPanel.clearFields();
         }
     }
 
-    // Method for MarketPlaceGUI to call to update the search results table
     public void updateSearchResults(ArrayList<String[]> searchData) {
         if (searchBuyPanel != null) {
             searchBuyPanel.updateSearchResults(searchData);
         }
     }
 
-    // Method for MarketPlaceGUI to call to update the user's listings table
     public void updateMyListings(ArrayList<String[]> listingsData) {
         if (manageListingsPanel != null) {
             manageListingsPanel.updateListingsTable(listingsData);
         }
     }
 
-    // Method for MarketPlaceGUI to call to display received messages
     public void displayMessages(List<String> messages) {
         if (messagingPanel != null) {
             messagingPanel.displayMessages(messages);
         }
     }
 
-    // Method for MarketPlaceGUI to call after sending a message
     public void clearMessageSendFields() {
         if (messagingPanel != null) {
             messagingPanel.clearSendFields();
         }
     }
 
-    // TODO: Add methods to update the content of other specific panels later
-    // e.g., public void displayMessages(ArrayList<Message> messages)
+
+    public void updateSellerSearchResults(ArrayList<String[]> sellerData) {
+        // Assuming seller search display is part of SearchBuyPanel for now
+        if (searchBuyPanel != null) {
+            searchBuyPanel.updateSellerSearchResults(sellerData);
+        } else {
+            System.err.println("Dashboard: SearchBuyPanel is null, cannot update seller results.");
+        }
+    }
+
+    public void updateSoldItemsView(ArrayList<String[]> soldItemsData) {
+        // Assuming sold items display is part of AccountPanel
+        if (accountPanel != null) {
+            accountPanel.updateSoldItemsView(soldItemsData);
+        } else {
+            System.err.println("Dashboard: AccountPanel is null, cannot update sold items.");
+        }
+    }
+
+    public void promptForRating(String sellerName) {
+        SwingUtilities.invokeLater(() -> {
+            // Simple integer input for rating
+             String[] options = {"1", "2", "3", "4", "5"};
+            String ratingStr = (String) JOptionPane.showInputDialog(
+                    this, // Parent component
+                    "Rate the seller '" + sellerName + "' (1-5 stars):", // Message
+                    "Rate Seller", // Title
+                    JOptionPane.QUESTION_MESSAGE,
+                    null, // Icon
+                    options, // Selection values
+                    options[4]); // Default selection (5 stars)
+
+            if (ratingStr != null && !ratingStr.isEmpty()) {
+                try {
+                    int rating = Integer.parseInt(ratingStr);
+                    if (rating >= 1 && rating <= 5) {
+                        // Send the rating back to the server via guiManager
+                        guiManager.requestRateSeller(sellerName, rating);
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Invalid rating selected.", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (NumberFormatException e) {
+                     JOptionPane.showMessageDialog(this, "Invalid rating format.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                // User cancelled or closed the dialog
+                System.out.println("User chose not to rate seller: " + sellerName);
+            }
+        });
+    }
+
+    public void updateAverageRatingDisplay(String ratingText) {
+        if (accountPanel != null) {
+            accountPanel.setAverageRating(ratingText);
+        } else {
+            System.err.println("Dashboard: AccountPanel is null, cannot update average rating.");
+        }
+    }
+
+    public void clearSearchResults() {
+        if (searchBuyPanel != null) {
+            searchBuyPanel.clearSearchResultsTable();
+        }
+    }
 
 } 

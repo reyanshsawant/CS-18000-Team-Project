@@ -1,3 +1,2 @@
-test,test,236.0
-test1234,test1234,864.0
-test2,test2,12.0
+test,test,1234687.0,11,3
+test1234,test1234,1536.0,0,0

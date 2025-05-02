@@ -1,4 +1,9 @@
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 /**
  * ItemManager Class
@@ -11,6 +16,7 @@ import java.util.ArrayList;
 
 public class SoldItemManager {
     private final String soldItemsFile = "sold_items.txt";
+    // File Format: itemName,description,price,category,sellerUsername,buyerUsername
 
     public SoldItemManager() {
         File file = new File(soldItemsFile);
@@ -21,10 +27,10 @@ public class SoldItemManager {
         }
     }
 
-    public synchronized void recordSale(Item item) {
+    public synchronized void recordSale(Item item, String buyerUsername) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(soldItemsFile, true))) {
             writer.write(item.getName() + "," + item.getDescription() + "," + item.getPrice() + ","
-                    + item.getCategory() + "," + item.getSeller());
+                    + item.getCategory() + "," + item.getSellerName() + "," + buyerUsername);
             writer.newLine();
         } catch (IOException e) {
             System.out.println("Error writing sold item.");
@@ -36,16 +42,31 @@ public class SoldItemManager {
         try (BufferedReader reader = new BufferedReader(new FileReader(soldItemsFile))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",", 5);
-                if (parts.length == 5 && parts[4].equals(sellerUsername)) {
+                String[] parts = line.split(",", 6);
+                if (parts.length == 6 && parts[4].equals(sellerUsername)) {
                     Item item = new Item(parts[0], parts[1], Double.parseDouble(parts[2]), parts[3]);
-                    item.setSeller(parts[4]);
+                    item.setSellerName(parts[4]);
                     soldItems.add(item);
                 }
             }
-        } catch (IOException e) {
-            System.out.println("Error reading sold items.");
+        } catch (IOException | NumberFormatException e) {
+            System.out.println("Error reading or parsing sold items file: " + e.getMessage());
         }
         return soldItems;
+    }
+
+    public synchronized boolean hasBuyerPurchasedFromSeller(String buyerUsername, String sellerUsername) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(soldItemsFile))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",", 6);
+                if (parts.length == 6 && parts[4].equals(sellerUsername) && parts[5].equals(buyerUsername)) {
+                    return true;
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading sold items file for purchase check: " + e.getMessage());
+        }
+        return false;
     }
 }

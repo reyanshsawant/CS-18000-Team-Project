@@ -10,12 +10,16 @@ public class User implements UserInterface {
     private String userName;
     private String userPassword;
     private double balance;
+    private int totalRatingSum;   // Added for seller ratings
+    private int numberOfRatings; // Added for seller ratings
 
     // Constructor with balance parameter
     public User(String username, String password, double balance) {
         this.userName = username;
         this.userPassword = password;
         this.balance = balance;
+        this.totalRatingSum = 0;  // Initialize ratings
+        this.numberOfRatings = 0; // Initialize ratings
     }
 
     @Override
@@ -63,4 +67,45 @@ public class User implements UserInterface {
         this.balance = balance;
     }
 
+    // Setter for loading from file
+    @Override
+    public void setTotalRatingSum(int sum) {
+        this.totalRatingSum = sum;
+    }
+
+    // Setter for loading from file
+    @Override
+    public void setNumberOfRatings(int count) {
+        this.numberOfRatings = count;
+    }
+
+    // Seller rating methods
+    @Override
+    public void addRating(int rating) {
+        if (rating >= 1 && rating <= 5) { // Basic validation
+            this.totalRatingSum += rating;
+            this.numberOfRatings++;
+        }
+    }
+
+    // Seller rating methods
+    @Override
+    public int getTotalRatingSum() {
+        return totalRatingSum;
+    }
+
+    // Seller rating methods
+    @Override
+    public int getNumberOfRatings() {
+        return numberOfRatings;
+    }
+
+    // Seller rating methods
+    @Override
+    public double getAverageRating() {
+        if (numberOfRatings == 0) {
+            return 0.0; // Avoid division by zero, return neutral rating
+        }
+        return (double) totalRatingSum / numberOfRatings;
+    }
 }

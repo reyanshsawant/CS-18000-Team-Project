@@ -53,70 +53,71 @@ public class MarketPlaceClient {
         }
 
         try {
-            while (true) {
-                StringBuilder block = new StringBuilder();
-                String line;
-                String lastLine = "";
-
-                while ((line = in.readLine()) != null) {
-                    block.append(line).append("\n");
-                    lastLine = line.trim();
-                    if (lastLine.endsWith(":") || lastLine.toLowerCase().contains("goodbye!") || lastLine.toLowerCase().contains("logged out.")) {
-                        break;
-                    }
-                    if (lastLine.toLowerCase().startsWith("login successful.") || lastLine.toLowerCase().startsWith("invalid credentials.")) {
-                        break;
-                    }
-                    if (lastLine.toLowerCase().startsWith("account created successfully.") || lastLine.toLowerCase().startsWith("username already exists.")) {
-                        break;
-                    }
-                    if (lastLine.toLowerCase().startsWith("account deleted successfully.")) {
-                        break;
-                    }
+            String line;
+            while ((line = in.readLine()) != null) {
+                String trimmedLine = line.trim();
+                if (!trimmedLine.isEmpty()) {
+                    System.out.println("CLIENT_LOOP: Received line: [" + trimmedLine + "]");
+                    guiCallback.displayServerMessage(trimmedLine);
                 }
 
-                String serverMessage = block.toString();
-
-                if (line == null) {
-                    guiCallback.connectionLost();
-                    break;
-                }
-
-                guiCallback.displayServerMessage(serverMessage);
-
-                if (lastLine.toLowerCase().startsWith("login successful.")) {
+                if (trimmedLine.toLowerCase().startsWith("login successful.")) {
                     try {
-                        loggedInUser = lastLine.split("Welcome ")[1].trim();
+                        loggedInUser = trimmedLine.split("Welcome ")[1].trim();
+                        System.out.println("CLIENT_LOOP: Login success detected.");
                         guiCallback.loginSuccess(loggedInUser);
                     } catch (Exception e) {
-                        System.err.println("Error parsing username from login success message: " + lastLine);
+                        System.err.println("Error parsing username from login success message: " + trimmedLine);
                         guiCallback.loginSuccess("UnknownUser");
                     }
-                } else if (lastLine.toLowerCase().startsWith("invalid credentials.")) {
+                } else if (trimmedLine.toLowerCase().startsWith("invalid credentials.")) {
+                    System.out.println("CLIENT_LOOP: Login failure detected.");
                     guiCallback.loginFailure();
                 }
 
-                if (lastLine.toLowerCase().contains("goodbye!") || lastLine.toLowerCase().contains("logged out.")) {
+                if (trimmedLine.toLowerCase().contains("goodbye!") || trimmedLine.toLowerCase().contains("logged out.")) {
+                    System.out.println("CLIENT_LOOP: Logout/Goodbye detected.");
                     loggedInUser = null;
                     guiCallback.clientDisconnected();
                     break;
                 }
 
-                if (lastLine.endsWith(":")) {
+                // If the line ends with a colon, assume it's a prompt requiring input
+                // UNLESS it's a known intermediate message that doesn't actually need input yet.
+                boolean isIgnoredInfoPrompt = trimmedLine.startsWith("No items listed by");
+                
+                if (trimmedLine.endsWith(":") && !isIgnoredInfoPrompt) {
+                    System.out.println("CLIENT_LOOP: Prompt detected: [" + trimmedLine + "]. Requesting input from GUI.");
                     String userInput = guiCallback.getUserInput();
 
                     if (userInput == null) {
                         System.err.println("GUI did not provide input. Closing connection.");
                         break;
                     }
-
+                    
+                    System.out.println("CLIENT_LOOP: Sending input: [" + userInput + "]");
                     out.println(userInput);
                     out.flush();
+                    
+                    if (out.checkError()) {
+                        System.err.println("CLIENT_LOOP: Error sending data to server.");
+                        guiCallback.connectionLost();
+                        break;
+                    }
+                    System.out.println("CLIENT_LOOP: Input sent successfully.");
                 }
             }
+            
+            if (line == null) {
+                System.out.println("CLIENT_LOOP: Server closed connection (readLine returned null).");
+                guiCallback.connectionLost();
+            }
+
         } catch (IOException e) {
+            System.err.println("CLIENT_LOOP: IOException during read/write: " + e.getMessage());
             guiCallback.connectionLost();
         } finally {
+            System.out.println("CLIENT_LOOP: Exiting start method, closing connection.");
             closeConnection();
         }
     }
