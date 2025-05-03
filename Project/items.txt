@@ -1,3 +1,5 @@
 test2,test2,12.0,null,test,Electronics
 test3,test3,12.0,null,test,Electronics
 test4,test4,23.0,null,test,Electronics
+flowers,good flowers,100.0,null,test,Sports
+flowers2,flowers2,100.0,null,test4,Electronics
