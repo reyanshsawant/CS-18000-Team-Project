@@ -11,6 +11,10 @@ This project is a command-line-based marketplace application developed as part o
 -   Send and receive messages
     
 -   Conduct secure transactions
+
+-   Rate sellers
+
+-   and more
     
 
 ----------
@@ -37,7 +41,10 @@ This project is a command-line-based marketplace application developed as part o
         
         CopyEdit
         
-        `java Main` 
+        `java ServerMain`
+
+        `java MarketPlaceClient`
+         
         
     -   To run the test suite:
         
@@ -52,13 +59,15 @@ This project is a command-line-based marketplace application developed as part o
 
 ## Submission Details
 
--   **Reyansh Sawant** – Wrote `Item.java`, `ItemInterface.java`, and `ItemManager.java`
+-   **Reyansh Sawant** – Wrote `Item.java`, `ItemInterface.java`, `ItemManager.java`, `MarketPlaceClient.java` and `MarketPlaceServer.java`
     
 -   **Neil Lapsia** – Wrote `Message.java`, `MessageInterface.java`, and `MessageManager.java`
     
--   **Shankh Gupta** – Wrote `User.java`, `UserInterface.java`, and `UserManager.java`
+-   **Shankh Gupta** – Wrote `User.java`, `UserInterface.java`,`UserManager.java`, `ClientHandler.java`,`ClientInterface.java`. Integrated modules for phase 2, debugged, updated `README.md`, and submitted the final
     
 -   **Arjun Anilkumar** – Wrote `RunLocalTestCase.java`, `Main.java`, and `MainDatabase.java`; integrated all modules, debugged the application, authored the `README.md`, and submitted the final build
+
+-   **Nikhil** - Wrote `SoldItemManager.java`, `RatingManager.java`.
     
 
 ----------
@@ -164,6 +173,27 @@ This project is a command-line-based marketplace application developed as part o
     -   Provides a command-line interface
         
     -   Handles user flow: login, item transactions, messaging, account management
+
+13.  **`ClientHandler` Class**  
+    The creation of a client
+    
+    -   Creates a client class for any user to become when they connect with server
+        
+    -   Handles user flow: login, item transactions, messaging, account management
+
+13.  **`ServerMain` Class**  
+    The entry point for the application.
+    
+    -   Starts the server for the user to join
+    
+14.  **`SoldItemManager` Class**  
+    
+    -   Collects all the sold items
+
+15.  **`RatingManager` Class**  
+    The entry point for the application.
+    
+    -   Creates the method used to store all the sellers ratings.
         
 
 ----------
@@ -182,6 +212,8 @@ This project is a command-line-based marketplace application developed as part o
 -   List, search, buy, and delete items
     
 -   Manage account balance
+
+-   Rate sellers
     
 
 ### Messaging

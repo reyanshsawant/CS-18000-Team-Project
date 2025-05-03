@@ -1,0 +1,7 @@
+Computer,testls,400.0,Electronics,shankh
+Computer,testls,400.0,Electronics,shankh
+comp,computer,300.0,electronic,shankh
+comp,comp,200.0,comp,shankh
+comp,comp,200.0,comp,shankh
+comp,comp,200.0,comp,shankh
+comp,comp,300.0,comp,shankh
