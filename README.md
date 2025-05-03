@@ -43,7 +43,7 @@ This project is a command-line-based marketplace application developed as part o
         
         `java ServerMain`
 
-        `java MarketPlaceClient`
+        `java MarketPlaceGUI`
          
         
     -   To run the test suite:
